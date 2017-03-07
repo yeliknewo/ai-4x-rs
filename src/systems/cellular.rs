@@ -44,7 +44,7 @@ impl System<f64> for CellSystem {
         let (mut cells, mut render_datas) = arg.fetch(|world| (world.write::<Cell>(), world.write::<RenderData>()));
 
         for (mut cell, mut render_data) in (&mut cells, &mut render_datas).iter() {
-            let next_class = (cell.get_class() as i64 + cell.get_x() + cell.get_y()) as u64;
+            let next_class = (cell.get_class() as i64 + cell.get_x() * cell.get_y()) as u64;
             cell.set_class(next_class);
 
             let index: usize = cell.get_class() as usize % self.sprites.len();

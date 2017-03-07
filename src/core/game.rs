@@ -1,12 +1,12 @@
 use art;
 use cgmath::{Euler, Point3, Rad, Vector3};
-use components::{Camera, Cell, RenderData, RenderId, Transform};
+use components::{Camera, RenderData, RenderId, Transform};
 use core::BackEventClump;
 use events::{MainFromGame, MainToGame};
 use find_folder::Search;
 use graphics::{NGFactory, OutColor, OutDepth, load_texture};
 use specs::{Planner, World};
-use systems::{CellSystem, ControlSystem, RenderSystem};
+use systems::{ControlSystem, RenderSystem};
 use time::precise_time_ns;
 use utils::{DuoChannel, FpsCounter, OrthographicHelper};
 
@@ -25,7 +25,7 @@ impl Game {
             let mut world = World::new();
 
             world.register::<Camera>();
-            world.register::<Cell>();
+            // world.register::<Cell>();
             // world.register::<Randomized>();
             world.register::<RenderData>();
             world.register::<RenderId>();
@@ -57,12 +57,12 @@ impl Game {
                     .with(main_render.clone())
                     .with(RenderData::new(art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::yellow::BLANK, art::main::SIZE))
                     // .with(Randomized::new(i))
-                    .with(Cell::new(x, y, 0))
+                    // .with(Cell::new(x, y, 0))
                     .build();
             }
         }
 
-        planner.add_system(CellSystem::new(), "cell", 20);
+        // planner.add_system(CellSystem::new(), "cell", 20);
 
         // planner.add_system(RandomizerSystem::new(), "randomizer", 20);
 
@@ -89,7 +89,7 @@ impl Game {
         }
         let new_time = precise_time_ns();
         let delta = (new_time - self.last_time) as f64 / 1e9;
-        if delta < 1.0 / 60.0 {
+        if delta <= 1.0 / 60.0 {
             true
         } else {
             self.last_time = new_time;

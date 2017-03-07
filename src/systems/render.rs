@@ -160,7 +160,7 @@ impl<ID> RenderSystem<ID>
 impl<ID> System<f64> for RenderSystem<ID>
     where ID: Send + Eq
 {
-    fn run(&mut self, arg: RunArg, delta_time: f64) {
+    fn run(&mut self, arg: RunArg, _delta_time: f64) {
         if self.done {
             arg.fetch(|_| {});
             return;

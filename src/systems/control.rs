@@ -22,7 +22,7 @@ impl ControlSystem {
 }
 
 impl System<f64> for ControlSystem {
-    fn run(&mut self, arg: RunArg, delta_time: f64) {
+    fn run(&mut self, arg: RunArg, _delta_time: f64) {
         arg.fetch(|_| ());
     }
 }

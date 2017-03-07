@@ -6,15 +6,14 @@ use events::{MainFromGame, MainToGame};
 use find_folder::Search;
 use graphics::{NGFactory, OutColor, OutDepth, load_texture};
 use specs::{Planner, World};
-use systems::{ControlSystem, RenderSystem};
+use systems::{ControlSystem, FpsCounterSystem, RenderSystem};
 use time::precise_time_ns;
-use utils::{DuoChannel, FpsCounter, OrthographicHelper};
+use utils::{DuoChannel, OrthographicHelper};
 
 pub struct Game {
     last_time: u64,
     planner: Planner<f64>,
     main_channel: DuoChannel<MainFromGame, MainToGame>,
-    fps_counter: FpsCounter,
 }
 
 impl Game {
@@ -63,11 +62,12 @@ impl Game {
 
         planner.add_system(renderer, "renderer", 10);
 
+        planner.add_system(FpsCounterSystem::new(55), "fps_counter", 5);
+
         Game {
             last_time: precise_time_ns(),
             main_channel: back_event_clump.take_game().unwrap_or_else(|| panic!("Game was none")),
             planner: planner,
-            fps_counter: FpsCounter::new(55),
         }
     }
 
@@ -88,7 +88,6 @@ impl Game {
             self.last_time = new_time;
 
             self.planner.dispatch(delta);
-            self.fps_counter.frame(delta);
             true
         }
     }

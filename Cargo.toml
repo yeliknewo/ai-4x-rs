@@ -1,0 +1,20 @@
+[package]
+name = "ai-4x-rs"
+version = "0.1.0"
+authors = ["Kiley Owen <owenk@wit.edu>"]
+
+[dependencies]
+cgmath = "*"
+log = "*"
+env_logger = "*"
+rustc-serialize = "*"
+gfx = "*"
+gfx_device_gl = "*"
+# gfx_window_sdl = "*"
+gfx_window_glutin = "*"
+glutin = "*"
+image = "*"
+# sdl2 = "*"
+find_folder = "*"
+specs = "*"
+time = "*"

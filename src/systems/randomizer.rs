@@ -50,7 +50,7 @@ impl System<f64> for RandomizerSystem {
         let (randomizeds, mut render_datas) = arg.fetch(|world| (world.read::<Randomized>(), world.write::<RenderData>()));
 
         for (randomized, mut render_data) in (&randomizeds, &mut render_datas).iter() {
-            if self.i % randomized.get_i() == 0 {
+            if (self.i + randomized.get_i()) % 21 == 0 {
                 render_data.set_spritesheet_rect(self.get_random_rect());
             }
         }

@@ -50,7 +50,7 @@ impl Game {
                 .create_now()
                 .with(Transform::new(Vector3::new(i as f32, 0.0, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
                 .with(main_render.clone())
-                .with(RenderData::new(art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::BOX, art::main::SIZE))
+                .with(RenderData::new(art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::yellow::BLANK, art::main::SIZE))
                 .build();
         }
 

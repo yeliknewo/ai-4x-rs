@@ -1,6 +1,6 @@
 use art;
 use cgmath::{Euler, Point3, Rad, Vector3};
-use components::{Camera, RenderData, RenderId, Transform};
+use components::{Button, Camera, RenderData, RenderId, Transform};
 use core::BackEventClump;
 use events::{MainFromGame, MainToGame};
 use find_folder::Search;
@@ -24,6 +24,7 @@ impl Game {
         let mut planner = {
             let mut world = World::new();
 
+            world.register::<Button>();
             world.register::<Camera>();
             world.register::<RenderData>();
             world.register::<RenderId>();

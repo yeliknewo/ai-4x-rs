@@ -25,8 +25,6 @@ impl Game {
             let mut world = World::new();
 
             world.register::<Camera>();
-            // world.register::<Cell>();
-            // world.register::<Randomized>();
             world.register::<RenderData>();
             world.register::<RenderId>();
             world.register::<Transform>();
@@ -56,15 +54,9 @@ impl Game {
                     .with(Transform::new(Vector3::new(x as f32, y as f32, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
                     .with(main_render.clone())
                     .with(RenderData::new(art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::yellow::BLANK, art::main::SIZE))
-                    // .with(Randomized::new(i))
-                    // .with(Cell::new(x, y, 0))
                     .build();
             }
         }
-
-        // planner.add_system(CellSystem::new(), "cell", 20);
-
-        // planner.add_system(RandomizerSystem::new(), "randomizer", 20);
 
         planner.add_system(ControlSystem::new(back_event_clump.take_control().unwrap_or_else(|| panic!("Control was none"))), "control", 15);
 

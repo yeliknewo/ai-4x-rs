@@ -1,11 +1,11 @@
 use art;
 use cgmath::{Euler, Point3, Rad, Vector3};
-use components::{Camera, RenderData, RenderId, Transform};
+use components::{Camera, Randomized, RenderData, RenderId, Transform};
 use core::BackEventClump;
 use find_folder::Search;
 use graphics::{NGFactory, OutColor, OutDepth, load_texture};
 use specs::{Planner, World};
-use systems::{ControlSystem, RenderSystem};
+use systems::{ControlSystem, RandomizerSystem, RenderSystem};
 use time::precise_time_ns;
 use utils::{FpsCounter, OrthographicHelper};
 
@@ -22,10 +22,11 @@ impl Game {
         let mut planner = {
             let mut world = World::new();
 
-            world.register::<Transform>();
-            world.register::<RenderId>();
             world.register::<Camera>();
+            world.register::<Randomized>();
             world.register::<RenderData>();
+            world.register::<RenderId>();
+            world.register::<Transform>();
 
             Planner::<f64>::new(world, 8)
         };
@@ -45,14 +46,18 @@ impl Game {
             renderer.add_render(factory, &packet, texture)
         };
 
-        for i in -10..10 {
-            planner.mut_world()
-                .create_now()
-                .with(Transform::new(Vector3::new(i as f32, 0.0, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
-                .with(main_render.clone())
-                .with(RenderData::new(art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::yellow::BLANK, art::main::SIZE))
-                .build();
+        for x in -10..10 {
+            for y in -10..10 {
+                planner.mut_world()
+                    .create_now()
+                    .with(Transform::new(Vector3::new(x as f32, y as f32, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
+                    .with(main_render.clone())
+                    .with(RenderData::new(art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::yellow::BLANK, art::main::SIZE))
+                    .build();
+            }
         }
+
+        planner.add_system(RandomizerSystem::new(), "randomizer", 20);
 
         planner.add_system(ControlSystem::new(back_event_clump.take_control().unwrap_or_else(|| panic!("Control was none"))), "control", 15);
 

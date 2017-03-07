@@ -85,8 +85,10 @@ impl Camera {
     }
 
     pub fn take_dirty(&mut self) -> bool {
-        self.dirty_1 = false;
-        if self.dirty_2 {
+        if self.dirty_1 {
+            self.dirty_1 = false;
+            true
+        } else if self.dirty_2 {
             self.dirty_2 = false;
             true
         } else {

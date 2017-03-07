@@ -23,15 +23,19 @@ gfx_defines!{
         spritesheet_size: [f32; 2] = "u_SpritesheetSize",
     }
 
-    constant ProjectionData {
+    constant ModelData {
         model: [[f32; 4]; 4] = "u_Model",
+    }
+
+    constant CameraData {
         view: [[f32; 4]; 4] = "u_View",
         proj: [[f32; 4]; 4] ="u_Proj",
     }
 
     pipeline pipe {
         vbuf: gfx::VertexBuffer<Vertex> = (),
-        projection_data: gfx::ConstantBuffer<ProjectionData> = "b_ProjData",
+        model_data: gfx::ConstantBuffer<ModelData> = "b_ModelData",
+        projection_data: gfx::ConstantBuffer<CameraData> = "b_ProjData",
         spritesheet: gfx::TextureSampler<[f32; 4]> = "t_Texture",
         texture_data: gfx::ConstantBuffer<TextureData> = "b_TextureData",
         out_color: gfx::BlendTarget<::graphics::ColorFormat> = ("Target0", gfx::state::MASK_ALL, gfx::preset::blend::ALPHA),

@@ -1,17 +1,19 @@
 use art;
 use cgmath::{Euler, Point3, Rad, Vector3};
-use components::{Camera, Randomized, RenderData, RenderId, Transform};
+use components::{Camera, Cell, RenderData, RenderId, Transform};
 use core::BackEventClump;
+use events::{MainFromGame, MainToGame};
 use find_folder::Search;
 use graphics::{NGFactory, OutColor, OutDepth, load_texture};
 use specs::{Planner, World};
-use systems::{ControlSystem, RandomizerSystem, RenderSystem};
+use systems::{CellSystem, ControlSystem, RenderSystem};
 use time::precise_time_ns;
-use utils::{FpsCounter, OrthographicHelper};
+use utils::{DuoChannel, FpsCounter, OrthographicHelper};
 
 pub struct Game {
     last_time: u64,
     planner: Planner<f64>,
+    main_channel: DuoChannel<MainFromGame, MainToGame>,
     fps_counter: FpsCounter,
 }
 
@@ -23,7 +25,8 @@ impl Game {
             let mut world = World::new();
 
             world.register::<Camera>();
-            world.register::<Randomized>();
+            world.register::<Cell>();
+            // world.register::<Randomized>();
             world.register::<RenderData>();
             world.register::<RenderId>();
             world.register::<Transform>();
@@ -46,22 +49,22 @@ impl Game {
             renderer.add_render(factory, &packet, texture)
         };
 
-        let mut i = 0;
-
         for x in -10..10 {
             for y in -10..10 {
-                i += 1;
                 planner.mut_world()
                     .create_now()
                     .with(Transform::new(Vector3::new(x as f32, y as f32, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
                     .with(main_render.clone())
                     .with(RenderData::new(art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::yellow::BLANK, art::main::SIZE))
-                    .with(Randomized::new(i))
+                    // .with(Randomized::new(i))
+                    .with(Cell::new(x, y, 0))
                     .build();
             }
         }
 
-        planner.add_system(RandomizerSystem::new(), "randomizer", 20);
+        planner.add_system(CellSystem::new(), "cell", 20);
+
+        // planner.add_system(RandomizerSystem::new(), "randomizer", 20);
 
         planner.add_system(ControlSystem::new(back_event_clump.take_control().unwrap_or_else(|| panic!("Control was none"))), "control", 15);
 
@@ -69,12 +72,21 @@ impl Game {
 
         Game {
             last_time: precise_time_ns(),
+            main_channel: back_event_clump.take_game().unwrap_or_else(|| panic!("Game was none")),
             planner: planner,
             fps_counter: FpsCounter::new(55),
         }
     }
 
     pub fn frame(&mut self) -> bool {
+        if let Some(event) = self.main_channel.try_recv() {
+            match event {
+                MainToGame::Exit => {
+                    self.main_channel.send(MainFromGame::Exited);
+                    return false;
+                }
+            }
+        }
         let new_time = precise_time_ns();
         let delta = (new_time - self.last_time) as f64 / 1e9;
         if delta < 1.0 / 60.0 {

@@ -1,12 +1,12 @@
 use core::{Game, make_event_clumps};
 use core::handle_events::glutin::handle_events;
-use events::{MainFromRender, MainToRender};
+use events::{MainFromGame, MainFromRender, MainToGame, MainToRender};
 use gfx::Device;
 use std::thread;
 use utils::OrthographicHelper;
 
 pub fn start() {
-    let (mut front_event_clump, back_event_clump) = make_event_clumps(0, 1, 2, 3);
+    let (mut front_event_clump, back_event_clump) = make_event_clumps();
 
     let title = "Twitch Game";
 
@@ -46,8 +46,8 @@ pub fn start() {
             match event {
                 MainFromRender::Encoder(mut encoder, encoder_id) => {
                     if handle_events(&mut gfx_window, &mut front_event_clump) {
-                        front_event_clump.get_mut_render().unwrap_or_else(|| panic!("Render was none")).send(MainToRender::Encoder(encoder, encoder_id));
-                        break 'main;
+                        front_event_clump.get_mut_render().unwrap_or_else(|| panic!("Render was none")).send(MainToRender::Exit);
+                        continue;
                     }
 
                     encoder.flush(gfx_window.get_mut_device());
@@ -55,9 +55,19 @@ pub fn start() {
                     gfx_window.swap_buffers();
                     gfx_window.get_mut_device().cleanup();
                 }
+                MainFromRender::Exited => {
+                    front_event_clump.get_mut_game().unwrap_or_else(|| panic!("Game was none")).send(MainToGame::Exit);
+                }
+            }
+        }
+        if let Some(event) = front_event_clump.get_mut_game().unwrap_or_else(|| panic!("Game was none")).try_recv() {
+            match event {
+                MainFromGame::Exited => {
+                    break 'main;
+                }
             }
         }
     }
 
-    // game_handle.join().unwrap_or_else(|err| panic!("Join Error: {:?}", err));
+    game_handle.join().unwrap_or_else(|err| panic!("Join Error: {:?}", err));
 }

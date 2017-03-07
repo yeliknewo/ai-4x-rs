@@ -3,8 +3,11 @@
 in vec3 a_Pos;
 in vec2 a_Uv;
 
-uniform b_ProjData {
+uniform b_ModelData {
     mat4 u_Model;
+};
+
+uniform b_ProjData {
     mat4 u_View;
     mat4 u_Proj;
 };

@@ -3,7 +3,7 @@ use events::{MainFromRender, MainToRender};
 use gfx::Primitive;
 use gfx::texture::{FilterMethod, SamplerInfo, WrapMode};
 use gfx::traits::{Factory, FactoryExt};
-use graphics::{Bundle, NGEncoder, NGFactory, NGResources, NGTexture, OutColor, OutDepth, Packet, ProjectionData, Shaders, TextureData, make_shaders, pipe};
+use graphics::{Bundle, CameraData, ModelData, NGEncoder, NGFactory, NGResources, NGTexture, OutColor, OutDepth, Packet, Shaders, TextureData, make_shaders, pipe};
 use specs::{RunArg, System};
 use std::sync::Arc;
 use utils::DuoChannel;
@@ -11,6 +11,7 @@ use utils::DuoChannel;
 pub struct RenderSystem<ID>
     where ID: Send + Eq
 {
+    done: bool,
     main_channel: DuoChannel<MainFromRender<ID>, MainToRender<ID>>,
     out_color: OutColor,
     out_depth: OutDepth,
@@ -23,6 +24,7 @@ impl<ID> RenderSystem<ID>
 {
     pub fn new(main_channel: DuoChannel<MainFromRender<ID>, MainToRender<ID>>, out_color: OutColor, out_depth: OutDepth) -> RenderSystem<ID> {
         RenderSystem {
+            done: false,
             main_channel: main_channel,
             out_color: out_color,
             out_depth: out_depth,
@@ -50,6 +52,7 @@ impl<ID> RenderSystem<ID>
             spritesheet: (texture, factory.create_sampler(sampler_info)),
             texture_data: factory.create_constant_buffer(1),
             projection_data: factory.create_constant_buffer(1),
+            model_data: factory.create_constant_buffer(1),
             out_color: self.out_color.clone(),
             out_depth: self.out_depth.clone(),
         };
@@ -89,27 +92,30 @@ impl<ID> RenderSystem<ID>
         let mut datas = vec![];
 
         for (render_id, transform, render_data) in (&render_ids, &mut transforms, &mut render_datas).iter() {
-            let mut projection_data = None;
+            let mut camera_data = None;
 
-            if dirty_cam || true {
-                projection_data = Some(ProjectionData {
-                    model: transform.get_model().into(),
+            if dirty_cam {
+                camera_data = Some(CameraData {
                     view: view.into(),
                     proj: proj.into(),
                 });
             }
 
+            let model_data = ModelData {
+                model: transform.get_model().into(),
+            };
+
             let mut texture_data = None;
 
-            //if render_data.take_dirty() {
-            texture_data = Some(TextureData {
-                tint: render_data.get_tint(),
-                spritesheet_rect: render_data.get_spritesheet_rect(),
-                spritesheet_size: render_data.get_spritesheet_size(),
-            });
-            //}
+            if render_data.take_dirty() {
+                texture_data = Some(TextureData {
+                    tint: render_data.get_tint(),
+                    spritesheet_rect: render_data.get_spritesheet_rect(),
+                    spritesheet_size: render_data.get_spritesheet_size(),
+                });
+            }
 
-            datas.push((render_id.get_render_id_num(), render_data.get_layer(), texture_data, projection_data));
+            datas.push((render_id.get_render_id_num(), render_data.get_layer(), texture_data, camera_data, model_data));
         }
 
         datas.sort_by_key(|k| k.1);
@@ -127,6 +133,8 @@ impl<ID> RenderSystem<ID>
                 encoder.update_constant_buffer(&b.get_data().projection_data, &projection_data);
             }
 
+            encoder.update_constant_buffer(&b.get_data().model_data, &data.4);
+
             b.encode(&mut encoder);
         }
 
@@ -139,6 +147,12 @@ impl<ID> RenderSystem<ID>
                 self.render(arg, encoder, encoder_id);
                 false
             }
+            MainToRender::Exit => {
+                self.main_channel.send(MainFromRender::Exited);
+                arg.fetch(|_| {});
+                self.done = true;
+                false
+            }
         }
     }
 }
@@ -147,6 +161,10 @@ impl<ID> System<f64> for RenderSystem<ID>
     where ID: Send + Eq
 {
     fn run(&mut self, arg: RunArg, delta_time: f64) {
+        if self.done {
+            arg.fetch(|_| {});
+            return;
+        }
         let mut event = self.main_channel.try_recv();
         while self.process_event(&arg,
                                  match event {

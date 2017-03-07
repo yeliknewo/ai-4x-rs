@@ -14,6 +14,7 @@ extern crate find_folder;
 extern crate specs;
 extern crate time;
 extern crate env_logger;
+extern crate rand;
 
 mod art;
 mod components;

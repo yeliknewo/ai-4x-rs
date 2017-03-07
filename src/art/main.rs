@@ -1,4 +1,4 @@
-use art::{Name, RenderType, Size, Sprite, Tint};
+use art::{Name, RenderType, Size, Tint};
 
 pub const NAME: Name = "main.png";
 pub const SIZE: Size = &[410.0, 304.0];
@@ -9,6 +9,8 @@ pub mod yellow {
     use art::Sprite;
 
     const Y: f32 = 4.0;
+
+    pub const ARRAY: &[Sprite; 6] = &[BLANK, X, CIRCLE, SQUARE, TRIANGLE, STAR];
 
     pub const BLANK: Sprite = &[4.0, Y, 32.0, 31.5];
     pub const X: Sprite = &[37.0, Y, 32.0, 31.5];
@@ -23,6 +25,8 @@ pub mod dark_yellow {
 
     const Y: f32 = 37.0;
 
+    pub const ARRAY: &[Sprite; 6] = &[BLANK, X, CIRCLE, SQUARE, TRIANGLE, STAR];
+
     pub const BLANK: Sprite = &[4.0, Y, 32.0, 31.5];
     pub const X: Sprite = &[37.0, Y, 32.0, 31.5];
     pub const CIRCLE: Sprite = &[70.0, Y, 32.0, 31.5];
@@ -35,6 +39,8 @@ pub mod mint_choc {
     use art::Sprite;
 
     const Y: f32 = 70.0;
+
+    pub const ARRAY: &[Sprite; 6] = &[BLANK, X, CIRCLE, SQUARE, TRIANGLE, STAR];
 
     pub const BLANK: Sprite = &[4.0, Y, 32.0, 31.5];
     pub const X: Sprite = &[37.0, Y, 32.0, 31.5];
@@ -49,6 +55,8 @@ pub mod dark_green {
 
     const Y: f32 = 103.0;
 
+    pub const ARRAY: &[Sprite; 6] = &[BLANK, X, CIRCLE, SQUARE, TRIANGLE, STAR];
+
     pub const BLANK: Sprite = &[4.0, Y, 32.0, 31.5];
     pub const X: Sprite = &[37.0, Y, 32.0, 31.5];
     pub const CIRCLE: Sprite = &[70.0, Y, 32.0, 31.5];
@@ -61,6 +69,8 @@ pub mod green {
     use art::Sprite;
 
     const Y: f32 = 136.0;
+
+    pub const ARRAY: &[Sprite; 6] = &[BLANK, X, CIRCLE, SQUARE, TRIANGLE, STAR];
 
     pub const BLANK: Sprite = &[4.0, Y, 32.0, 31.5];
     pub const X: Sprite = &[37.0, Y, 32.0, 31.5];
@@ -75,6 +85,8 @@ pub mod blue {
 
     const Y: f32 = 169.0;
 
+    pub const ARRAY: &[Sprite; 6] = &[BLANK, X, CIRCLE, SQUARE, TRIANGLE, STAR];
+
     pub const BLANK: Sprite = &[4.0, Y, 32.0, 31.5];
     pub const X: Sprite = &[37.0, Y, 32.0, 31.5];
     pub const CIRCLE: Sprite = &[70.0, Y, 32.0, 31.5];
@@ -87,6 +99,8 @@ pub mod blue_green {
     use art::Sprite;
 
     const Y: f32 = 202.0;
+
+    pub const ARRAY: &[Sprite; 6] = &[BLANK, X, CIRCLE, SQUARE, TRIANGLE, STAR];
 
     pub const BLANK: Sprite = &[4.0, Y, 32.0, 31.5];
     pub const X: Sprite = &[37.0, Y, 32.0, 31.5];
@@ -101,6 +115,8 @@ pub mod dark_purple {
 
     const Y: f32 = 235.0;
 
+    pub const ARRAY: &[Sprite; 6] = &[BLANK, X, CIRCLE, SQUARE, TRIANGLE, STAR];
+
     pub const BLANK: Sprite = &[4.0, Y, 32.0, 31.5];
     pub const X: Sprite = &[37.0, Y, 32.0, 31.5];
     pub const CIRCLE: Sprite = &[70.0, Y, 32.0, 31.5];
@@ -113,6 +129,8 @@ pub mod purple {
     use art::Sprite;
 
     const Y: f32 = 268.0;
+
+    pub const ARRAY: &[Sprite; 6] = &[BLANK, X, CIRCLE, SQUARE, TRIANGLE, STAR];
 
     pub const BLANK: Sprite = &[4.0, Y, 32.0, 31.5];
     pub const X: Sprite = &[37.0, Y, 32.0, 31.5];
@@ -128,6 +146,8 @@ pub mod purple_red {
     const X_OFFSET: f32 = 209.0;
     const Y: f32 = 4.0;
 
+    pub const ARRAY: &[Sprite; 6] = &[BLANK, X, CIRCLE, SQUARE, TRIANGLE, STAR];
+
     pub const BLANK: Sprite = &[X_OFFSET, Y, 32.0, 31.5];
     pub const X: Sprite = &[X_OFFSET + 33.0, Y, 32.0, 31.5];
     pub const CIRCLE: Sprite = &[X_OFFSET + 66.0, Y, 32.0, 31.5];
@@ -141,6 +161,8 @@ pub mod pink {
 
     const X_OFFSET: f32 = 209.0;
     const Y: f32 = 37.0;
+
+    pub const ARRAY: &[Sprite; 6] = &[BLANK, X, CIRCLE, SQUARE, TRIANGLE, STAR];
 
     pub const BLANK: Sprite = &[X_OFFSET, Y, 32.0, 31.5];
     pub const X: Sprite = &[X_OFFSET + 33.0, Y, 32.0, 31.5];
@@ -156,6 +178,8 @@ pub mod red {
     const X_OFFSET: f32 = 209.0;
     const Y: f32 = 70.0;
 
+    pub const ARRAY: &[Sprite; 6] = &[BLANK, X, CIRCLE, SQUARE, TRIANGLE, STAR];
+
     pub const BLANK: Sprite = &[X_OFFSET, Y, 32.0, 31.5];
     pub const X: Sprite = &[X_OFFSET + 33.0, Y, 32.0, 31.5];
     pub const CIRCLE: Sprite = &[X_OFFSET + 66.0, Y, 32.0, 31.5];
@@ -169,6 +193,8 @@ pub mod dark_red {
 
     const X_OFFSET: f32 = 209.0;
     const Y: f32 = 103.0;
+
+    pub const ARRAY: &[Sprite; 6] = &[BLANK, X, CIRCLE, SQUARE, TRIANGLE, STAR];
 
     pub const BLANK: Sprite = &[X_OFFSET, Y, 32.0, 31.5];
     pub const X: Sprite = &[X_OFFSET + 33.0, Y, 32.0, 31.5];
@@ -184,6 +210,8 @@ pub mod dark_orange {
     const X_OFFSET: f32 = 209.0;
     const Y: f32 = 136.0;
 
+    pub const ARRAY: &[Sprite; 6] = &[BLANK, X, CIRCLE, SQUARE, TRIANGLE, STAR];
+
     pub const BLANK: Sprite = &[X_OFFSET, Y, 32.0, 31.5];
     pub const X: Sprite = &[X_OFFSET + 33.0, Y, 32.0, 31.5];
     pub const CIRCLE: Sprite = &[X_OFFSET + 66.0, Y, 32.0, 31.5];
@@ -197,6 +225,8 @@ pub mod orange {
 
     const X_OFFSET: f32 = 209.0;
     const Y: f32 = 169.0;
+
+    pub const ARRAY: &[Sprite; 6] = &[BLANK, X, CIRCLE, SQUARE, TRIANGLE, STAR];
 
     pub const BLANK: Sprite = &[X_OFFSET, Y, 32.0, 31.5];
     pub const X: Sprite = &[X_OFFSET + 33.0, Y, 32.0, 31.5];
@@ -212,6 +242,8 @@ pub mod light_grey {
     const X_OFFSET: f32 = 209.0;
     const Y: f32 = 202.0;
 
+    pub const ARRAY: &[Sprite; 6] = &[BLANK, X, CIRCLE, SQUARE, TRIANGLE, STAR];
+
     pub const BLANK: Sprite = &[X_OFFSET, Y, 32.0, 31.5];
     pub const X: Sprite = &[X_OFFSET + 33.0, Y, 32.0, 31.5];
     pub const CIRCLE: Sprite = &[X_OFFSET + 66.0, Y, 32.0, 31.5];
@@ -226,6 +258,8 @@ pub mod grey {
     const X_OFFSET: f32 = 209.0;
     const Y: f32 = 235.0;
 
+    pub const ARRAY: &[Sprite; 6] = &[BLANK, X, CIRCLE, SQUARE, TRIANGLE, STAR];
+
     pub const BLANK: Sprite = &[X_OFFSET, Y, 32.0, 31.5];
     pub const X: Sprite = &[X_OFFSET + 33.0, Y, 32.0, 31.5];
     pub const CIRCLE: Sprite = &[X_OFFSET + 66.0, Y, 32.0, 31.5];
@@ -239,6 +273,8 @@ pub mod dark_grey {
 
     const X_OFFSET: f32 = 209.0;
     const Y: f32 = 268.0;
+
+    pub const ARRAY: &[Sprite; 6] = &[BLANK, X, CIRCLE, SQUARE, TRIANGLE, STAR];
 
     pub const BLANK: Sprite = &[X_OFFSET, Y, 32.0, 31.5];
     pub const X: Sprite = &[X_OFFSET + 33.0, Y, 32.0, 31.5];

@@ -101,13 +101,13 @@ impl<ID> RenderSystem<ID>
 
             let mut texture_data = None;
 
-            if render_data.take_dirty() {
-                texture_data = Some(TextureData {
-                    tint: render_data.get_tint(),
-                    spritesheet_rect: render_data.get_spritesheet_rect(),
-                    spritesheet_size: render_data.get_spritesheet_size(),
-                });
-            }
+            //if render_data.take_dirty() {
+            texture_data = Some(TextureData {
+                tint: render_data.get_tint(),
+                spritesheet_rect: render_data.get_spritesheet_rect(),
+                spritesheet_size: render_data.get_spritesheet_size(),
+            });
+            //}
 
             datas.push((render_id.get_render_id_num(), render_data.get_layer(), texture_data, projection_data));
         }

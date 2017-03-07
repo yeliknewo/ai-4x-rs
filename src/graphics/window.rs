@@ -1,6 +1,6 @@
 use gfx::Resources;
 use gfx::handle::{DepthStencilView, RenderTargetView};
-use graphics::{ColorFormat, DepthFormat, ng_glutin, ng_sdl2};
+use graphics::{ColorFormat, DepthFormat, ng_glutin};
 
 pub struct GfxWindow<W, T, D, F, R>
     where R: Resources

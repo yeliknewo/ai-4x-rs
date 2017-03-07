@@ -1,6 +1,6 @@
 mod pipeline;
 mod ng_glutin;
-mod ng_sdl2;
+// mod ng_sdl2;
 mod shaders;
 mod texture;
 mod window;

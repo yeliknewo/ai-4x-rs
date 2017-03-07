@@ -1,11 +1,19 @@
 use specs::{Component, VecStorage};
 
 #[derive(Debug, Clone, PartialEq, Hash)]
-pub struct Randomized {}
+pub struct Randomized {
+    i: u64,
+}
 
 impl Randomized {
-    pub fn new() -> Randomized {
-        Randomized {}
+    pub fn new(i: u64) -> Randomized {
+        Randomized {
+            i: i,
+        }
+    }
+
+    pub fn get_i(&self) -> u64 {
+        self.i
     }
 }
 

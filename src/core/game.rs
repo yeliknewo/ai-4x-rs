@@ -46,13 +46,17 @@ impl Game {
             renderer.add_render(factory, &packet, texture)
         };
 
+        let mut i = 0;
+
         for x in -10..10 {
             for y in -10..10 {
+                i += 1;
                 planner.mut_world()
                     .create_now()
                     .with(Transform::new(Vector3::new(x as f32, y as f32, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
                     .with(main_render.clone())
                     .with(RenderData::new(art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::yellow::BLANK, art::main::SIZE))
+                    .with(Randomized::new(i))
                     .build();
             }
         }
@@ -66,17 +70,21 @@ impl Game {
         Game {
             last_time: precise_time_ns(),
             planner: planner,
-            fps_counter: FpsCounter::new(50),
+            fps_counter: FpsCounter::new(55),
         }
     }
 
     pub fn frame(&mut self) -> bool {
         let new_time = precise_time_ns();
         let delta = (new_time - self.last_time) as f64 / 1e9;
-        self.last_time = new_time;
+        if delta < 1.0 / 60.0 {
+            true
+        } else {
+            self.last_time = new_time;
 
-        self.planner.dispatch(delta);
-        self.fps_counter.frame(delta);
-        true
+            self.planner.dispatch(delta);
+            self.fps_counter.frame(delta);
+            true
+        }
     }
 }

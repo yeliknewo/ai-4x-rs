@@ -68,7 +68,7 @@ impl Game {
         planner.mut_world()
             .create_now()
             .with(Transform::new(Vector3::new(-7.0, -7.0, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(3.0, 3.0, 1.0)))
-            .with(RenderDataText::new(art::layers::GUI, "aa".into(), art::colors::WHITE))
+            .with(RenderDataText::new(art::layers::GUI, "ab".into(), art::colors::WHITE))
             .with(Button::new())
             .build();
 

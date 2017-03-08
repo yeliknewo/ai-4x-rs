@@ -64,6 +64,7 @@ impl<ID> RenderSystem<ID>
             projection_data: factory.create_constant_buffer(1),
             model_data: factory.create_constant_buffer(1),
             offset: factory.create_constant_buffer(1),
+            color: factory.create_constant_buffer(1),
             out_color: self.out_color.clone(),
             out_depth: self.out_depth.clone(),
         };
@@ -210,10 +211,21 @@ impl<ID> RenderSystem<ID>
                     model: transform.get_model().into(),
                 };
 
+                let color = pipeline_text::Color {
+                    color: render_data_text.get_color().clone(),
+                };
+
                 let mut i = 0;
 
                 for character in render_data_text.get_text().chars() {
-                    datas.push((self.get_character_index(character), render_data_text.get_layer(), camera_data, model_data));
+                    datas.push((self.get_character_index(character),
+                                render_data_text.get_layer(),
+                                camera_data,
+                                model_data,
+                                pipeline_text::Offset {
+                                    offset: [i as f32, 0.0],
+                                },
+                                color));
                     i += 1;
                 }
             }
@@ -230,6 +242,10 @@ impl<ID> RenderSystem<ID>
                 }
 
                 encoder.update_constant_buffer(&b.get_data().model_data, &data.3);
+
+                encoder.update_constant_buffer(&b.get_data().offset, &data.4);
+
+                encoder.update_constant_buffer(&b.get_data().color, &data.5);
 
                 b.encode(&mut encoder);
             }

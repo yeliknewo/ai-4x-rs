@@ -1,4 +1,4 @@
-use cgmath::{Matrix4, Point2, Point3, SquareMatrix, Vector3, Vector4};
+use cgmath::{Matrix4, Point2, Point3, Vector3, Vector4};
 use specs::{Component, VecStorage};
 use utils::OrthographicHelper;
 

@@ -36,7 +36,7 @@ impl Game {
 
         planner.mut_world().create_now().with(Camera::new(Point3::new(0.0, 0.0, 2.0), Point3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 1.0, 0.0), ortho, true)).build();
 
-        let packet = art::make_square_render();
+        let packet_square = art::make_square_render();
 
         let assets = Search::ParentsThenKids(5, 3)
             .for_folder("assets")
@@ -44,11 +44,11 @@ impl Game {
 
         let main_render = {
             let texture = load_texture(factory, assets.join(art::main::NAME));
-            renderer.add_render_spritesheet(factory, &packet, texture)
+            renderer.add_render_spritesheet(factory, &packet_square, texture)
         };
 
-        for x in -5..5 {
-            for y in -5..5 {
+        for x in -5..5i32 {
+            for y in -5..5i32 {
                 planner.mut_world()
                     .create_now()
                     .with(Transform::new(Vector3::new(x as f32, y as f32, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
@@ -57,6 +57,20 @@ impl Game {
                     .build();
             }
         }
+
+        let alphabet = "abcdefghijklmnopqrstuvwxyz";
+
+        for character in alphabet.chars() {
+            let packet = art::make_text_render(character);
+            renderer.add_render_text(factory, &packet, character);
+        }
+
+        planner.mut_world()
+            .create_now()
+            .with(Transform::new(Vector3::new(-7.0, -7.0, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(3.0, 3.0, 1.0)))
+            .with(RenderDataText::new(art::layers::GUI, "aa".into(), art::colors::WHITE))
+            .with(Button::new())
+            .build();
 
         planner.add_system(ControlSystem::new(back_event_clump.take_control().unwrap_or_else(|| panic!("Control was none")), screen_size), "control", 15);
 

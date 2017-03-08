@@ -14,7 +14,6 @@ pub fn make_shaders() -> Shaders {
 gfx_defines!{
     vertex Vertex {
         pos: [f32; 3] = "a_Pos",
-        color: [f32; 4] = "a_Color",
     }
 
     constant ModelData {
@@ -30,21 +29,25 @@ gfx_defines!{
         offset: [f32; 2] = "u_Offset",
     }
 
+    constant Color {
+        color: [f32; 4] = "u_Color",
+    }
+
     pipeline pipe {
         vbuf: gfx::VertexBuffer<Vertex> = (),
         model_data: gfx::ConstantBuffer<ModelData> = "b_ModelData",
         projection_data: gfx::ConstantBuffer<CameraData> = "b_ProjData",
         offset: gfx::ConstantBuffer<Offset> = "b_Offset",
+        color: gfx::ConstantBuffer<Color> = "b_Color",
         out_color: gfx::BlendTarget<::graphics::ColorFormat> = ("Target0", gfx::state::MASK_ALL, gfx::preset::blend::ALPHA),
         out_depth: gfx::DepthTarget<::graphics::DepthFormat> = gfx::preset::depth::LESS_EQUAL_WRITE,
     }
 }
 
 impl Vertex {
-    pub fn new(pos: [f32; 3], color: [f32; 4]) -> Vertex {
+    pub fn new(pos: [f32; 3]) -> Vertex {
         Vertex {
             pos: pos,
-            color: color,
         }
     }
 }

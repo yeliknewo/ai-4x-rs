@@ -1,4 +1,4 @@
-use art::main::{blue, yellow};
+use art::main::blue;
 use cgmath::{MetricSpace, Point2, Vector2};
 use components::{Button, Camera, RenderDataSpritesheet, Transform};
 use events::{MainFromControl, MainToControl};

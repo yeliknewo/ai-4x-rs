@@ -1,3 +1,4 @@
+use cgmath::Point2;
 use core::{Game, make_event_clumps};
 use core::handle_events::glutin::handle_events;
 use events::{MainFromGame, MainFromRender, MainToGame, MainToRender};
@@ -11,6 +12,8 @@ pub fn start() {
     let title = "Twitch Game";
 
     let (width, height): (u32, u32) = (640, 480);
+
+    let screen_size = Point2::new(width as f32, height as f32);
 
     use graphics::glutin_build_window as build_window;
 
@@ -34,7 +37,7 @@ pub fn start() {
 
     let ortho = OrthographicHelper::new(aspect_ratio, left, right, near, far);
 
-    let game = Game::new(gfx_window.get_mut_factory(), back_event_clump, ortho.as_ref().clone(), out_color, out_depth);
+    let game = Game::new(gfx_window.get_mut_factory(), back_event_clump, ortho.as_ref().clone(), out_color, out_depth, screen_size);
 
     let game_handle = thread::spawn(|| {
         let mut game = game;

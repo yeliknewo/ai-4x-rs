@@ -8,8 +8,8 @@ pub struct OrthographicHelper {
 
 impl OrthographicHelper {
     pub fn new(aspect_ratio: f32, left: f32, right: f32, near: f32, far: f32) -> OrthographicHelper {
-        let bottom = left * aspect_ratio;
-        let top = right * aspect_ratio;
+        let bottom = left / aspect_ratio;
+        let top = right / aspect_ratio;
 
         OrthographicHelper {
             aspect_ratio: aspect_ratio,

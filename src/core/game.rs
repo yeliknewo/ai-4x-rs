@@ -1,5 +1,5 @@
 use art;
-use cgmath::{Euler, Point3, Rad, Vector3};
+use cgmath::{Euler, Point2, Point3, Rad, Vector3};
 use components::{Button, Camera, RenderData, RenderId, Transform};
 use core::BackEventClump;
 use events::{MainFromGame, MainToGame};
@@ -17,7 +17,7 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new<ID>(factory: &mut NGFactory, mut back_event_clump: BackEventClump<ID>, ortho: OrthographicHelper, out_color: OutColor, out_depth: OutDepth) -> Game
+    pub fn new<ID>(factory: &mut NGFactory, mut back_event_clump: BackEventClump<ID>, ortho: OrthographicHelper, out_color: OutColor, out_depth: OutDepth, screen_size: Point2<f32>) -> Game
         where ID: 'static + Eq + Send
     {
         let mut planner = {
@@ -47,18 +47,19 @@ impl Game {
             renderer.add_render(factory, &packet, texture)
         };
 
-        for x in -10..10 {
-            for y in -10..10 {
+        for x in -5..5 {
+            for y in -5..5 {
                 planner.mut_world()
                     .create_now()
                     .with(Transform::new(Vector3::new(x as f32, y as f32, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
                     .with(main_render.clone())
                     .with(RenderData::new(art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::yellow::BLANK, art::main::SIZE))
+                    .with(Button::new())
                     .build();
             }
         }
 
-        planner.add_system(ControlSystem::new(back_event_clump.take_control().unwrap_or_else(|| panic!("Control was none"))), "control", 15);
+        planner.add_system(ControlSystem::new(back_event_clump.take_control().unwrap_or_else(|| panic!("Control was none")), screen_size), "control", 15);
 
         planner.add_system(renderer, "renderer", 10);
 

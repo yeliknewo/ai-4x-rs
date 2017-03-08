@@ -105,15 +105,11 @@ impl<ID> RenderSystem<ID>
                 model: transform.get_model().into(),
             };
 
-            let mut texture_data = None;
-
-            if render_data.take_dirty() {
-                texture_data = Some(TextureData {
-                    tint: render_data.get_tint(),
-                    spritesheet_rect: render_data.get_spritesheet_rect(),
-                    spritesheet_size: render_data.get_spritesheet_size(),
-                });
-            }
+            let texture_data = TextureData {
+                tint: render_data.get_tint(),
+                spritesheet_rect: render_data.get_spritesheet_rect(),
+                spritesheet_size: render_data.get_spritesheet_size(),
+            };
 
             datas.push((render_id.get_render_id_num(), render_data.get_layer(), texture_data, camera_data, model_data));
         }
@@ -125,9 +121,7 @@ impl<ID> RenderSystem<ID>
                 .get(data.0)
                 .unwrap_or_else(|| panic!("No Bundle found"));
 
-            if let Some(texture_data) = data.2 {
-                encoder.update_constant_buffer(&b.get_data().texture_data, &texture_data);
-            }
+            encoder.update_constant_buffer(&b.get_data().texture_data, &data.2);
 
             if let Some(projection_data) = data.3 {
                 encoder.update_constant_buffer(&b.get_data().projection_data, &projection_data);

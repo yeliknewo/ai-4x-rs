@@ -1,4 +1,3 @@
-pub type RenderType = u8;
 pub type Layer = u8;
 pub type Name = &'static str;
 pub type Size = &'static [f32; 2];

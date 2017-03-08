@@ -1,7 +1,8 @@
 use specs::{Component, VecStorage};
 
 #[derive(Debug)]
-pub struct RenderData {
+pub struct RenderDataSpritesheet {
+    render_id_num: usize,
     default_tint: [f32; 4],
     tint: [f32; 4],
     layer: u8,
@@ -11,9 +12,10 @@ pub struct RenderData {
     dirty_2: bool,
 }
 
-impl RenderData {
-    pub fn new(layer: u8, tint: [f32; 4], spritesheet_rect: &'static [f32; 4], spritesheet_size: &'static [f32; 2]) -> RenderData {
-        RenderData {
+impl RenderDataSpritesheet {
+    pub fn new(render_id_num: usize, layer: u8, tint: [f32; 4], spritesheet_rect: &'static [f32; 4], spritesheet_size: &'static [f32; 2]) -> RenderDataSpritesheet {
+        RenderDataSpritesheet {
+            render_id_num: render_id_num,
             default_tint: tint.clone(),
             tint: tint,
             layer: layer,
@@ -22,6 +24,10 @@ impl RenderData {
             dirty_1: true,
             dirty_2: true,
         }
+    }
+
+    pub fn get_render_id_num(&self) -> usize {
+        self.render_id_num
     }
 
     pub fn set_layer(&mut self, layer: u8) {
@@ -82,6 +88,6 @@ impl RenderData {
     }
 }
 
-impl Component for RenderData {
-    type Storage = VecStorage<RenderData>;
+impl Component for RenderDataSpritesheet {
+    type Storage = VecStorage<RenderDataSpritesheet>;
 }

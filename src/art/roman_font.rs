@@ -1,9 +1,8 @@
-use art::{Name, RenderType, Size, Tint};
+use art::{Name, Size, Tint};
 
 pub const NAME: Name = "font.png";
 pub const SIZE: Size = &[930.0, 161.0];
 pub const DEFAULT_TINT: Tint = &[1.0, 1.0, 1.0, 1.0];
-pub const ID: RenderType = 1;
 
 pub mod alphabet {
     use art::Sprite;

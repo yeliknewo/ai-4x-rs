@@ -1,4 +1,5 @@
-use graphics::{Packet, Rasterizer, Vertex};
+use graphics::Rasterizer;
+use graphics::pipeline_spritesheet::{Packet, Vertex};
 
 pub fn make_square_render() -> Packet {
     let vertices = vec![Vertex::new([0.0, 0.0, 0.0], [1.0, 1.0]), Vertex::new([0.0, 1.0, 0.0], [1.0, 0.0]), Vertex::new([1.0, 1.0, 0.0], [0.0, 0.0]), Vertex::new([1.0, 0.0, 0.0], [0.0, 1.0])];

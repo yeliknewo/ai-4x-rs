@@ -1,9 +1,7 @@
 use specs::{Component, VecStorage};
 
 #[derive(Debug, Clone, PartialEq, Hash)]
-pub struct RenderId {
-    render_id_num: usize,
-}
+pub struct RenderId {}
 
 impl RenderId {
     pub fn new(render_id_num: usize) -> RenderId {

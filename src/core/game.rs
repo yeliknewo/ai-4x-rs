@@ -1,6 +1,6 @@
 use art;
 use cgmath::{Euler, Point2, Point3, Rad, Vector3};
-use components::{Button, Camera, RenderData, RenderId, Transform};
+use components::{Button, Camera, RenderDataSpritesheet, RenderDataText, Transform};
 use core::BackEventClump;
 use events::{MainFromGame, MainToGame};
 use find_folder::Search;
@@ -25,8 +25,8 @@ impl Game {
 
             world.register::<Button>();
             world.register::<Camera>();
-            world.register::<RenderData>();
-            world.register::<RenderId>();
+            world.register::<RenderDataSpritesheet>();
+            world.register::<RenderDataText>();
             world.register::<Transform>();
 
             Planner::<f64>::new(world, 8)
@@ -44,22 +44,15 @@ impl Game {
 
         let main_render = {
             let texture = load_texture(factory, assets.join(art::main::NAME));
-            renderer.add_render(factory, &packet, texture)
-        };
-
-        let text_render = {
-            let texture = load_texture(factory, assets.join(art::roman_font::NAME));
-            renderer.add_render(factory, &packet, texture)
+            renderer.add_render_spritesheet(factory, &packet, texture)
         };
 
         for x in -5..5 {
             for y in -5..5 {
                 planner.mut_world()
                     .create_now()
-                    .with(Transform::new(Vector3::new(x as f32, y as f32, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(0.5, 0.5, 1.0)))
-                    .with(text_render.clone())
-                    // .with(RenderData::new(art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::yellow::BLANK, art::main::SIZE))
-                    .with(RenderData::new(art::layers::PLAYER, *art::roman_font::DEFAULT_TINT, art::roman_font::alphabet::A, art::roman_font::SIZE))
+                    .with(Transform::new(Vector3::new(x as f32, y as f32, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
+                    .with(RenderDataSpritesheet::new(main_render, art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::yellow::BLANK, art::main::SIZE))
                     .with(Button::new())
                     .build();
             }

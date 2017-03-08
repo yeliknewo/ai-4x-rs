@@ -14,3 +14,9 @@ pub type NGEncoder = gfx::Encoder<NGResources, NGCommandBuffer>;
 
 pub type OutColor = gfx::handle::RenderTargetView<NGResources, ColorFormat>;
 pub type OutDepth = gfx::handle::DepthStencilView<NGResources, DepthFormat>;
+
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+pub enum RenderType {
+    Spritesheet,
+    Text,
+}

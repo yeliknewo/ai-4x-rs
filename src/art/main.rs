@@ -1,9 +1,8 @@
-use art::{Name, RenderType, Size, Tint};
+use art::{Name, Size, Tint};
 
 pub const NAME: Name = "main.png";
 pub const SIZE: Size = &[410.0, 304.0];
 pub const DEFAULT_TINT: Tint = &[0.5, 0.5, 0.5, 1.0];
-pub const ID: RenderType = 0;
 
 pub mod yellow {
     use art::Sprite;

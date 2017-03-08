@@ -13,7 +13,7 @@ pub fn make_shaders() -> Shaders {
 
 gfx_defines!{
     vertex Vertex {
-        pos: [f32; 3] = "a_Pos",
+        pos: [f32; 2] = "a_Pos",
     }
 
     constant ModelData {
@@ -45,7 +45,7 @@ gfx_defines!{
 }
 
 impl Vertex {
-    pub fn new(pos: [f32; 3]) -> Vertex {
+    pub fn new(pos: [f32; 2]) -> Vertex {
         Vertex {
             pos: pos,
         }

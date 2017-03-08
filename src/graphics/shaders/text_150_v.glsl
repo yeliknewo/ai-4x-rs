@@ -1,6 +1,6 @@
 #version 150 core
 
-in vec3 a_Pos;
+in vec2 a_Pos;
 
 uniform b_ModelData {
     mat4 u_Model;
@@ -16,5 +16,5 @@ uniform b_Offset {
 };
 
 void main() {
-    gl_Position = u_Proj * u_View * u_Model * vec4(a_Pos + vec3(u_Offset, 0.0), 1.0);
+    gl_Position = u_Proj * u_View * u_Model * vec4(a_Pos + u_Offset, 0.0, 1.0);
 }

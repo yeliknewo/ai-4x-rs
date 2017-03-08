@@ -1,6 +1,7 @@
 mod square;
 mod types;
 pub mod main;
+pub mod roman_font;
 pub mod layers;
 
 pub use self::square::make_square_render;

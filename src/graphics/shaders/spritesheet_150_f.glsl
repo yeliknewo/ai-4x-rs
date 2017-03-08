@@ -15,5 +15,5 @@ out vec4 Target0;
 void main() {
     vec4 scaledRect =  vec4(u_SpritesheetRect.xy, u_SpritesheetRect.zw + u_SpritesheetRect.xy) / u_SpritesheetSize.xyxy;
 
-    Target0 = texture(t_Texture, v_Uv * (scaledRect.zw - scaledRect.xy) + scaledRect.xy) * u_Tint;
+    Target0 = texture(t_Texture, v_Uv * (scaledRect.xw - scaledRect.zy) + scaledRect.zy) * u_Tint;
 }

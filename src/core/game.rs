@@ -47,13 +47,19 @@ impl Game {
             renderer.add_render(factory, &packet, texture)
         };
 
+        let text_render = {
+            let texture = load_texture(factory, assets.join(art::roman_font::NAME));
+            renderer.add_render(factory, &packet, texture)
+        };
+
         for x in -5..5 {
             for y in -5..5 {
                 planner.mut_world()
                     .create_now()
-                    .with(Transform::new(Vector3::new(x as f32, y as f32, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
-                    .with(main_render.clone())
-                    .with(RenderData::new(art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::yellow::BLANK, art::main::SIZE))
+                    .with(Transform::new(Vector3::new(x as f32, y as f32, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(0.5, 0.5, 1.0)))
+                    .with(text_render.clone())
+                    // .with(RenderData::new(art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::yellow::BLANK, art::main::SIZE))
+                    .with(RenderData::new(art::layers::PLAYER, *art::roman_font::DEFAULT_TINT, art::roman_font::alphabet::A, art::roman_font::SIZE))
                     .with(Button::new())
                     .build();
             }

@@ -32,7 +32,7 @@ impl OrthographicHelper {
         self.ortho.right
     }
 
-    pub fn get_bottom(&self) -> f32 {
+    pub fn get_bot(&self) -> f32 {
         self.ortho.bottom
     }
 

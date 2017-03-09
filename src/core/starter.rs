@@ -30,8 +30,8 @@ pub fn start() {
     let out_depth = gfx_window.get_out_depth().clone();
 
     let aspect_ratio = width as f32 / height as f32;
-    let left = -10.0;
-    let right = 10.0;
+    let left = -20.0;
+    let right = 20.0;
     let near = 0.0;
     let far = 10.0;
 

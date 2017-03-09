@@ -874,9 +874,31 @@ fn make_2_render() -> Packet {
 
 
 fn make_3_render() -> Packet {
-    let vertices = vec![];
+    let top_left_top = Vertex::new([0.0, 1.0]); //0
+    let top_left_bot = Vertex::new([0.0, 0.8]); //1
+    let top_right_out = Vertex::new([1.0, 1.0]); //2
+    let top_right_in = Vertex::new([0.8, 0.8]); //3
+    let mid_right_top = Vertex::new([0.8, 0.6]); //4
+    let mid_right_bot = Vertex::new([0.8, 0.4]); //5
+    let mid_left_top = Vertex::new([0.0, 0.6]); //6
+    let mid_left_bot = Vertex::new([0.0, 0.4]); //7
+    let bot_right_out = Vertex::new([1.0, 0.0]); //8
+    let bot_right_in = Vertex::new([0.8, 0.2]); //9
+    let bot_left_top = Vertex::new([0.0, 0.2]); //10
+    let bot_left_bot = Vertex::new([0.0, 0.0]); //11
 
-    let indices = vec![];
+    let vertices = vec![top_left_top, top_left_bot, top_right_out, top_right_in, mid_right_top, mid_right_bot, mid_left_top, mid_left_bot, bot_right_out, bot_right_in, bot_left_top, bot_left_bot];
+
+    let indices = vec![
+        0, 1, 3,//
+        3, 2, 0,
+        2, 3, 9,
+        9, 8, 2,
+        4, 6, 7,
+        7, 5, 4,
+        10, 11, 8,
+        8, 9, 10,
+    ];
 
     let rasterizer = Rasterizer::new_fill();
 
@@ -885,9 +907,27 @@ fn make_3_render() -> Packet {
 
 
 fn make_4_render() -> Packet {
-    let vertices = vec![];
+    let top_left_left = Vertex::new([0.0, 1.0]); //0
+    let top_left_right = Vertex::new([0.2, 1.0]); //1
+    let mid_left_out = Vertex::new([0.0, 0.4]); //2
+    let mid_left_in = Vertex::new([0.2, 0.6]); //3
+    let mid_right_top = Vertex::new([0.8, 0.6]); //4
+    let mid_right_bot = Vertex::new([0.8, 0.4]); //5
+    let top_right_left = Vertex::new([0.8, 1.0]); //6
+    let top_right_right = Vertex::new([1.0, 1.0]); //7
+    let bot_right_left = Vertex::new([0.8, 0.0]); //8
+    let bot_right_right = Vertex::new([1.0, 0.0]); //9
 
-    let indices = vec![];
+    let vertices = vec![top_left_left, top_left_right, mid_left_out, mid_left_in, mid_right_top, mid_right_bot, top_right_left, top_right_right, bot_right_left, bot_right_right];
+
+    let indices = vec![
+        1, 0, 2,//
+        2, 3, 1,
+        2, 5, 4,
+        4, 3, 2,
+        6, 8, 9,
+        9, 7, 6,
+    ];
 
     let rasterizer = Rasterizer::new_fill();
 
@@ -895,9 +935,33 @@ fn make_4_render() -> Packet {
 }
 
 fn make_5_render() -> Packet {
-    let vertices = vec![];
+    let top_right_top = Vertex::new([1.0, 1.0]); //0
+    let top_right_bot = Vertex::new([1.0, 0.8]); //1
+    let top_left_out = Vertex::new([0.0, 1.0]); //2
+    let top_left_in = Vertex::new([0.2, 0.8]); //3
+    let mid_left_out = Vertex::new([0.0, 0.4]); //4
+    let mid_left_in = Vertex::new([0.2, 0.6]); //5
+    let mid_right_out = Vertex::new([1.0, 0.6]); //6
+    let mid_right_in = Vertex::new([0.8, 0.4]); //7
+    let bot_right_out = Vertex::new([1.0, 0.0]); //8
+    let bot_right_in = Vertex::new([0.8, 0.2]); //9
+    let bot_left_top = Vertex::new([0.0, 0.2]); //10
+    let bot_left_bot = Vertex::new([0.0, 0.0]); //11
 
-    let indices = vec![];
+    let vertices = vec![top_right_top, top_right_bot, top_left_out, top_left_in, mid_left_out, mid_left_in, mid_right_out, mid_right_in, bot_right_out, bot_right_in, bot_left_top, bot_left_bot];
+
+    let indices = vec![
+        0, 2, 3,//
+        3, 1, 0,
+        2, 4, 5,
+        5, 3, 2,
+        4, 7, 6,
+        6, 5, 4,
+        6, 7, 9,
+        9, 8, 6,
+        8, 9, 10,
+        10, 11, 8,
+    ];
 
     let rasterizer = Rasterizer::new_fill();
 
@@ -905,9 +969,33 @@ fn make_5_render() -> Packet {
 }
 
 fn make_6_render() -> Packet {
-    let vertices = vec![];
+    let top_right_top = Vertex::new([1.0, 1.0]); //0
+    let top_right_bot = Vertex::new([1.0, 0.8]); //1
+    let top_left_out = Vertex::new([0.0, 1.0]); //2
+    let top_left_in = Vertex::new([0.2, 0.8]); //3
+    let bot_left_out = Vertex::new([0.0, 0.0]); //4
+    let bot_left_in = Vertex::new([0.2, 0.2]); //5
+    let bot_right_out = Vertex::new([1.0, 0.0]); //6
+    let bot_right_in = Vertex::new([0.8, 0.2]); //7
+    let mid_right_out = Vertex::new([1.0, 0.6]); //8
+    let mid_right_in = Vertex::new([0.8, 0.4]); //9
+    let mid_left_top = Vertex::new([0.2, 0.6]); //10
+    let mid_left_bot = Vertex::new([0.2, 0.4]); //11
 
-    let indices = vec![];
+    let vertices = vec![top_right_top, top_right_bot, top_left_out, top_left_in, bot_left_out, bot_left_in, bot_right_out, bot_right_in, mid_right_out, mid_right_in, mid_left_top, mid_left_bot];
+
+    let indices = vec![
+        0, 2, 3,//
+        3, 1, 0,
+        2, 4, 5,
+        5, 3, 2,
+        4, 6, 7,
+        7, 5, 4,
+        6, 8, 9,
+        9, 7, 6,
+        8, 10, 11,
+        11, 9, 8,
+    ];
 
     let rasterizer = Rasterizer::new_fill();
 
@@ -915,9 +1003,25 @@ fn make_6_render() -> Packet {
 }
 
 fn make_7_render() -> Packet {
-    let vertices = vec![];
+    let top_left_top_left = Vertex::new([0.0, 1.0]); //0
+    let top_left_bot_left = Vertex::new([0.0, 0.8]); //1
+    let top_left_bot_right = Vertex::new([0.2, 0.8]); //2
+    let top_left_top_right = Vertex::new([0.2, 1.0]); //3
+    let top_right_out = Vertex::new([1.0, 1.0]); //4
+    let top_right_in = Vertex::new([0.8, 0.8]); //5
+    let bot_right_left = Vertex::new([0.8, 0.0]); //6
+    let bot_right_right = Vertex::new([1.0, 0.0]); //7
 
-    let indices = vec![];
+    let vertices = vec![top_left_top_left, top_left_bot_left, top_left_bot_right, top_left_top_right, top_right_out, top_right_in, bot_right_left, bot_right_right];
+
+    let indices = vec![
+        0, 1, 2,//
+        2, 3, 0,
+        3, 2, 5,
+        5, 4, 3,
+        4, 5, 6,
+        6, 7, 4,
+    ];
 
     let rasterizer = Rasterizer::new_fill();
 

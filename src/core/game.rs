@@ -60,15 +60,24 @@ impl Game {
 
         let alphabet = "abcdefghijklmnopqrstuvwxyz";
 
-        for character in alphabet.chars() {
+        let digits = "1234567890";
+
+        for character in alphabet.chars().chain(digits.chars()) {
             let packet = art::make_text_render(character);
             renderer.add_render_text(factory, &packet, character);
         }
 
         planner.mut_world()
             .create_now()
-            .with(Transform::new(Vector3::new(-9.5, 6.0, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
+            .with(Transform::new(Vector3::new(-19.5, 7.0, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
             .with(RenderDataText::new(art::layers::GUI, "abcdefghijklmnopqrstuvwxyz".into(), art::colors::WHITE))
+            .with(Button::new())
+            .build();
+
+        planner.mut_world()
+            .create_now()
+            .with(Transform::new(Vector3::new(-19.5, 5.5, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
+            .with(RenderDataText::new(art::layers::GUI, "1234567890".into(), art::colors::WHITE))
             .with(Button::new())
             .build();
 

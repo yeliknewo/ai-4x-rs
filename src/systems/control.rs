@@ -29,7 +29,7 @@ impl System<f64> for ControlSystem {
         let camera = {
             let mut camera_opt = None;
 
-            for camera in (&cameras).iter() {
+            for camera in (&cameras).join() {
                 if camera.is_main() {
                     camera_opt = Some(camera);
                     break;
@@ -45,7 +45,7 @@ impl System<f64> for ControlSystem {
                 MainToControl::MouseButton(state, mouse_button) => {
                     let mouse_in_world = camera.screen_to_world_point(self.mouse_pos);
 
-                    for (transform, mut button) in (&transforms, &mut buttons).iter() {
+                    for (transform, mut button) in (&transforms, &mut buttons).join() {
                         let bot_left = transform.get_model() * Vector4::new(button.get_bot_left().x, button.get_bot_left().y, 1.0, 1.0);
 
                         let top_right = transform.get_model() * Vector4::new(button.get_top_right().x, button.get_top_right().y, 1.0, 1.0);

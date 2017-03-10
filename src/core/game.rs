@@ -11,7 +11,12 @@ use systems::{ControlSystem, FpsCounterSystem, MainMenuSystem, RenderSystem};
 use time::precise_time_ns;
 use utils::{DuoChannel, OrthographicHelper};
 
-const MAIN_MENU_SYSTEM_NAME: &'static str = "main_menu";
+const SYSTEM_NAME_MAIN_MENU: &'static str = "main_menu";
+const SYSTEM_NAME_RENDERER: &'static str = "renderer";
+const SYSTEM_NAME_CONTROL: &'static str = "control";
+const SYSTEM_NAME_FPS_COUNTER: &'static str = "fps_counter";
+const WARN_FPS: u32 = 55;
+const TARGET_FPS: f64 = 60.0;
 
 pub struct Game {
     last_time: u64,
@@ -22,7 +27,7 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new<ID>(factory: &mut NGFactory, mut back_event_clump: BackEventClump<ID>, ortho: OrthographicHelper, out_color: OutColor, out_depth: OutDepth, screen_size: Point2<f32>) -> Game
+    pub fn new<ID>(render_system: RenderSystem<u64>, main_render: usize, mut back_event_clump: BackEventClump<ID>, ortho: OrthographicHelper, screen_size: Point2<f32>) -> Game
         where ID: 'static + Eq + Send
     {
         let mut planner = {
@@ -34,23 +39,10 @@ impl Game {
             world.register::<RenderDataText>();
             world.register::<Transform>();
 
-            Planner::<f64>::new(world, 8)
+            Planner::<f64>::new(world)
         };
-
-        let mut renderer = RenderSystem::new(back_event_clump.take_main_x_render().unwrap_or_else(|| panic!("Main X Render was none")), out_color, out_depth);
 
         planner.mut_world().create_now().with(Camera::new(Point3::new(0.0, 0.0, 2.0), Point3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 1.0, 0.0), ortho, true)).build();
-
-        let packet_square = art::make_square_render();
-
-        let assets = Search::ParentsThenKids(5, 3)
-            .for_folder("assets")
-            .unwrap_or_else(|err| panic!("Did you forget to make an assets folder? Err: {:?}", err));
-
-        let main_render = {
-            let texture = load_texture(factory, assets.join(art::main::NAME));
-            renderer.add_render_spritesheet(factory, &packet_square, texture)
-        };
 
         // for x in -5..5i32 {
         //     for y in -5..5i32 {
@@ -62,15 +54,6 @@ impl Game {
         //             .build();
         //     }
         // }
-
-        let alphabet = "abcdefghijklmnopqrstuvwxyz";
-
-        let digits = "1234567890";
-
-        for character in alphabet.chars().chain(digits.chars()) {
-            let packet = art::make_text_render(character);
-            renderer.add_render_text(factory, &packet, character);
-        }
 
         let play_button = planner.mut_world()
             .create_now()
@@ -85,13 +68,13 @@ impl Game {
             .with(RenderDataText::new(art::layers::GUI, "play".into(), art::colors::WHITE, 1.2))
             .build();
 
-        planner.add_system(ControlSystem::new(back_event_clump.take_main_x_control().unwrap_or_else(|| panic!("Main X Control was none")), screen_size), "control", 20);
+        planner.add_system(ControlSystem::new(back_event_clump.take_main_x_control().unwrap_or_else(|| panic!("Main X Control was none")), screen_size), SYSTEM_NAME_CONTROL, 20);
 
-        planner.add_system(MainMenuSystem::new(play_button, play_button_text, back_event_clump.take_back_game_x_main_menu().unwrap_or_else(|| panic!("Back Game X Main Menu was none"))), MAIN_MENU_SYSTEM_NAME, 15);
+        planner.add_system(MainMenuSystem::new(play_button, play_button_text, back_event_clump.take_back_game_x_main_menu().unwrap_or_else(|| panic!("Back Game X Main Menu was none"))), SYSTEM_NAME_MAIN_MENU, 15);
 
-        planner.add_system(renderer, "renderer", 10);
+        planner.add_system(render_system, SYSTEM_NAME_RENDERER, 10);
 
-        planner.add_system(FpsCounterSystem::new(55), "fps_counter", 5);
+        planner.add_system(FpsCounterSystem::new(WARN_FPS), SYSTEM_NAME_FPS_COUNTER, 5);
 
         Game {
             last_time: precise_time_ns(),
@@ -115,19 +98,18 @@ impl Game {
             match event {
                 GameFromMainMenu::CreateMainGameScene => {
                     for i in 0..self.planner.systems.len() {
-                        if self.planner.systems[i].name == MAIN_MENU_SYSTEM_NAME {
-                            self.inactive_systems.insert(MAIN_MENU_SYSTEM_NAME, self.planner.systems.remove(i).object);
+                        if self.planner.systems[i].name == SYSTEM_NAME_MAIN_MENU {
+                            self.inactive_systems.insert(SYSTEM_NAME_MAIN_MENU, self.planner.systems.remove(i).object);
                             break;
                         }
                     }
-                    //remove main_menu and store
                     //add main game scene
                 }
             }
         }
         let new_time = precise_time_ns();
         let delta = (new_time - self.last_time) as f64 / 1e9;
-        if delta <= 1.0 / 60.0 {
+        if delta <= 1.0 / TARGET_FPS {
             true
         } else {
             self.last_time = new_time;

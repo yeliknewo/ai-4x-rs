@@ -135,7 +135,7 @@ impl<ID> RenderSystem<ID>
             let camera = {
                 let mut camera_opt = None;
 
-                for camera in (&mut cameras).iter() {
+                for camera in (&mut cameras).join() {
                     if camera.is_main() {
                         camera_opt = Some(camera);
                     }
@@ -151,7 +151,7 @@ impl<ID> RenderSystem<ID>
         {
             let mut datas: Vec<_> = vec![];
 
-            for (transform, render_data_spritesheet) in (&mut transforms, &mut render_datas_spritesheet).iter() {
+            for (transform, render_data_spritesheet) in (&mut transforms, &mut render_datas_spritesheet).join() {
                 let mut camera_data = None;
 
                 if dirty_cam {
@@ -197,7 +197,7 @@ impl<ID> RenderSystem<ID>
         {
             let mut datas: Vec<_> = vec![];
 
-            for (transform, render_data_text) in (&mut transforms, &mut render_datas_text).iter() {
+            for (transform, render_data_text) in (&mut transforms, &mut render_datas_text).join() {
                 let mut camera_data = None;
 
                 if dirty_cam {

@@ -3,8 +3,6 @@ use cgmath::{Euler, Point2, Point3, Rad, Vector3};
 use components::{Button, Camera, RenderDataSpritesheet, RenderDataText, Transform};
 use core::BackEventClump;
 use events::{GameFromMainMenu, GameToMainMenu, MainFromGame, MainToGame};
-use find_folder::Search;
-use graphics::{NGFactory, OutColor, OutDepth, load_texture};
 use specs::{Planner, System, World};
 use std::collections::HashMap;
 use systems::{ControlSystem, FpsCounterSystem, MainMenuSystem, RenderSystem};
@@ -24,6 +22,7 @@ pub struct Game {
     main_channel: DuoChannel<MainFromGame, MainToGame>,
     main_menu_channel: DuoChannel<GameToMainMenu, GameFromMainMenu>,
     inactive_systems: HashMap<&'static str, Box<System<f64>>>,
+    main_render: usize,
 }
 
 impl Game {
@@ -44,16 +43,7 @@ impl Game {
 
         planner.mut_world().create_now().with(Camera::new(Point3::new(0.0, 0.0, 2.0), Point3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 1.0, 0.0), ortho, true)).build();
 
-        // for x in -5..5i32 {
-        //     for y in -5..5i32 {
-        //         planner.mut_world()
-        //             .create_now()
-        //             .with(Transform::new(Vector3::new(x as f32, y as f32, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
-        //             .with(RenderDataSpritesheet::new(main_render, art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::yellow::BLANK, art::main::SIZE))
-        //             .with(Button::new())
-        //             .build();
-        //     }
-        // }
+
 
         let play_button = planner.mut_world()
             .create_now()
@@ -82,6 +72,7 @@ impl Game {
             main_menu_channel: back_event_clump.take_front_game_x_main_menu().unwrap_or_else(|| panic!("Front Game X Main Menu was none")),
             inactive_systems: HashMap::new(),
             planner: planner,
+            main_render: main_render,
         }
     }
 
@@ -103,6 +94,27 @@ impl Game {
                             break;
                         }
                     }
+                    for y in -10..10i32 {
+                        for x in -10..10i32 {
+                            self.planner
+                                .mut_world()
+                                .create_now()
+                                .with(Transform::new(Vector3::new(x as f32, y as f32, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
+                                .with(RenderDataSpritesheet::new(self.main_render, art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::yellow::BLANK, art::main::SIZE))
+                                .build();
+                        }
+                    }
+
+                    // for x in -5..5i32 {
+                    //     for y in -5..5i32 {
+                    //         planner.mut_world()
+                    //             .create_now()
+                    //             .with(Transform::new(Vector3::new(x as f32, y as f32, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
+                    //             .with(RenderDataSpritesheet::new(main_render, art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::yellow::BLANK, art::main::SIZE))
+                    //             .with(Button::new())
+                    //             .build();
+                    //     }
+                    // }
                     //add main game scene
                 }
             }

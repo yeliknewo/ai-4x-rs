@@ -1,6 +1,5 @@
-use art::main::blue;
-use cgmath::{MetricSpace, Point2, Vector2, Vector4};
-use components::{Button, Camera, RenderDataSpritesheet, Transform};
+use cgmath::{Point2, Vector4};
+use components::{Button, Camera, Transform};
 use events::{MainFromControl, MainToControl};
 use specs::{Join, RunArg, System};
 use utils::DuoChannel;

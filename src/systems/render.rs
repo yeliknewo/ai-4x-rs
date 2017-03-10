@@ -223,7 +223,7 @@ impl<ID> RenderSystem<ID>
                                 camera_data,
                                 model_data,
                                 pipeline_text::Offset {
-                                    offset: [i as f32 * 1.2, 0.0],
+                                    offset: [i as f32 * render_data_text.get_spacing(), 0.0],
                                 },
                                 color));
                     i += 1;

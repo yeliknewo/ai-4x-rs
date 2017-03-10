@@ -47,16 +47,16 @@ impl Game {
             renderer.add_render_spritesheet(factory, &packet_square, texture)
         };
 
-        for x in -5..5i32 {
-            for y in -5..5i32 {
-                planner.mut_world()
-                    .create_now()
-                    .with(Transform::new(Vector3::new(x as f32, y as f32, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
-                    .with(RenderDataSpritesheet::new(main_render, art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::yellow::BLANK, art::main::SIZE))
-                    .with(Button::new())
-                    .build();
-            }
-        }
+        // for x in -5..5i32 {
+        //     for y in -5..5i32 {
+        //         planner.mut_world()
+        //             .create_now()
+        //             .with(Transform::new(Vector3::new(x as f32, y as f32, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
+        //             .with(RenderDataSpritesheet::new(main_render, art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::yellow::BLANK, art::main::SIZE))
+        //             .with(Button::new())
+        //             .build();
+        //     }
+        // }
 
         let alphabet = "abcdefghijklmnopqrstuvwxyz";
 
@@ -66,20 +66,6 @@ impl Game {
             let packet = art::make_text_render(character);
             renderer.add_render_text(factory, &packet, character);
         }
-
-        planner.mut_world()
-            .create_now()
-            .with(Transform::new(Vector3::new(-19.5, 7.0, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
-            .with(RenderDataText::new(art::layers::GUI, "abcdefghijklmnopqrstuvwxyz".into(), art::colors::WHITE))
-            .with(Button::new())
-            .build();
-
-        planner.mut_world()
-            .create_now()
-            .with(Transform::new(Vector3::new(-19.5, 5.5, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
-            .with(RenderDataText::new(art::layers::GUI, "1234567890".into(), art::colors::WHITE))
-            .with(Button::new())
-            .build();
 
         planner.add_system(ControlSystem::new(back_event_clump.take_control().unwrap_or_else(|| panic!("Control was none")), screen_size), "control", 15);
 

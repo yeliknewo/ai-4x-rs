@@ -6,14 +6,16 @@ pub struct RenderDataText {
     layer: u8,
     text: String,
     color: Color,
+    spacing: f32,
 }
 
 impl RenderDataText {
-    pub fn new(layer: u8, text: String, color: Color) -> RenderDataText {
+    pub fn new(layer: u8, text: String, color: Color, spacing: f32) -> RenderDataText {
         RenderDataText {
             layer: layer,
             text: text,
             color: color,
+            spacing: spacing,
         }
     }
 
@@ -27,6 +29,10 @@ impl RenderDataText {
 
     pub fn get_color(&self) -> Color {
         self.color
+    }
+
+    pub fn get_spacing(&self) -> f32 {
+        self.spacing
     }
 
     pub fn set_text(&mut self, text: String) {

@@ -1,34 +1,47 @@
 use components::Button;
+use events::{GameFromMainMenu, GameToMainMenu};
 use specs::{Entity, Join, RunArg, System};
-use utils::{ButtonState, MouseButton};
+use utils::{ButtonState, DuoChannel, MouseButton};
 
 #[derive(Debug)]
 pub struct MainMenuSystem {
-    play_button: Entity,
-    play_button_text: Entity,
+    game_channel: DuoChannel<GameFromMainMenu, GameToMainMenu>,
+    play_button: Option<Entity>,
+    play_button_text: Option<Entity>,
 }
 
 impl MainMenuSystem {
-    pub fn new(play_button: Entity, play_button_text: Entity) -> MainMenuSystem {
+    pub fn new(game_channel: DuoChannel<GameFromMainMenu, GameToMainMenu>) -> MainMenuSystem {
         MainMenuSystem {
-            play_button: play_button,
-            play_button_text: play_button_text,
+            game_channel: game_channel,
+            play_button: None,
+            play_button_text: None,
         }
+    }
+
+    pub fn set_button(&mut self, play_button: Entity, play_button_text: Entity) {
+        self.play_button = Some(play_button);
+        self.play_button_text = Some(play_button_text);
     }
 }
 
 impl System<f64> for MainMenuSystem {
     fn run(&mut self, arg: RunArg, _delta_time: f64) {
-        let buttons = arg.fetch(|w| (w.read::<Button>()));
+        if self.play_button.is_some() && self.play_button_text.is_some() {
 
-        if let Some(play_button) = buttons.get(self.play_button) {
-            match play_button.get_button_state(MouseButton::Left) {
-                ButtonState::Pressed => {
-                    arg.delete(self.play_button);
-                    arg.delete(self.play_button_text);
+            let buttons = arg.fetch(|w| (w.read::<Button>()));
+
+            if let Some(play_button) = buttons.get(self.play_button.unwrap()) {
+                match play_button.get_button_state(MouseButton::Left) {
+                    ButtonState::Pressed => {
+                        arg.delete(self.play_button.take().unwrap());
+                        arg.delete(self.play_button_text.take().unwrap());
+                    }
+                    ButtonState::Released => (),
                 }
-                ButtonState::Released => (),
             }
+        } else {
+
         }
     }
 }

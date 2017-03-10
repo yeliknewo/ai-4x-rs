@@ -2,7 +2,7 @@ use art;
 use cgmath::{Euler, Point2, Point3, Rad, Vector3};
 use components::{Button, Camera, RenderDataSpritesheet, RenderDataText, Transform};
 use core::BackEventClump;
-use events::{MainFromGame, MainToGame};
+use events::{GameFromMainMenu, GameToMainMenu, MainFromGame, MainToGame};
 use find_folder::Search;
 use graphics::{NGFactory, OutColor, OutDepth, load_texture};
 use specs::{Planner, World};
@@ -14,6 +14,7 @@ pub struct Game {
     last_time: u64,
     planner: Planner<f64>,
     main_channel: DuoChannel<MainFromGame, MainToGame>,
+    main_menu_channel: DuoChannel<GameToMainMenu, GameFromMainMenu>,
 }
 
 impl Game {
@@ -32,7 +33,7 @@ impl Game {
             Planner::<f64>::new(world, 8)
         };
 
-        let mut renderer = RenderSystem::new(back_event_clump.take_render().unwrap_or_else(|| panic!("Render was none")), out_color, out_depth);
+        let mut renderer = RenderSystem::new(back_event_clump.take_main_x_render().unwrap_or_else(|| panic!("Main X Render was none")), out_color, out_depth);
 
         planner.mut_world().create_now().with(Camera::new(Point3::new(0.0, 0.0, 2.0), Point3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 1.0, 0.0), ortho, true)).build();
 
@@ -80,9 +81,13 @@ impl Game {
             .with(RenderDataText::new(art::layers::GUI, "play".into(), art::colors::WHITE, 1.2))
             .build();
 
-        planner.add_system(ControlSystem::new(back_event_clump.take_control().unwrap_or_else(|| panic!("Control was none")), screen_size), "control", 20);
+        planner.add_system(ControlSystem::new(back_event_clump.take_main_x_control().unwrap_or_else(|| panic!("Main X Control was none")), screen_size), "control", 20);
 
-        planner.add_system(MainMenuSystem::new(play_button, play_button_text), "main_menu", 15);
+        let mut main_menu = MainMenuSystem::new(back_event_clump.take_back_game_x_main_menu().unwrap_or_else(|| panic!("Back Game X Main Menu was none")));
+
+        main_menu.set_button(play_button, play_button_text);
+
+        planner.add_system(main_menu, "main_menu", 15);
 
         planner.add_system(renderer, "renderer", 10);
 
@@ -90,17 +95,26 @@ impl Game {
 
         Game {
             last_time: precise_time_ns(),
-            main_channel: back_event_clump.take_game().unwrap_or_else(|| panic!("Game was none")),
+            main_channel: back_event_clump.take_main_x_game().unwrap_or_else(|| panic!("Main X Game was none")),
+            main_menu_channel: back_event_clump.take_front_game_x_main_menu().unwrap_or_else(|| panic!("Front Game X Main Menu was none")),
             planner: planner,
         }
     }
 
     pub fn frame(&mut self) -> bool {
-        if let Some(event) = self.main_channel.try_recv() {
+        while let Some(event) = self.main_channel.try_recv() {
             match event {
                 MainToGame::Exit => {
                     self.main_channel.send(MainFromGame::Exited);
                     return false;
+                }
+            }
+        }
+        while let Some(event) = self.main_menu_channel.try_recv() {
+            match event {
+                GameFromMainMenu::CreateMainGameScene => {
+                    //remove main_menu and store
+                    //add main game scene
                 }
             }
         }

@@ -1,6 +1,6 @@
 use art;
 use cgmath::{Euler, Point2, Point3, Rad, Vector3};
-use components::{Button, Camera, RenderDataSpritesheet, RenderDataText, Transform};
+use components::{Button, Camera, Map, RenderDataSpritesheet, RenderDataText, Transform};
 use core::BackEventClump;
 use events::{GameFromMainMenu, GameToMainMenu, MainFromGame, MainToGame};
 use specs::{Planner, System, World};
@@ -34,6 +34,7 @@ impl Game {
 
             world.register::<Button>();
             world.register::<Camera>();
+            world.register::<Map>();
             world.register::<RenderDataSpritesheet>();
             world.register::<RenderDataText>();
             world.register::<Transform>();
@@ -94,28 +95,21 @@ impl Game {
                             break;
                         }
                     }
+
+                    let map = self.planner.mut_world().create_now().with(Map::new()).build();
+
                     for y in -10..10i32 {
                         for x in -10..10i32 {
-                            self.planner
+                            let tile = self.planner
                                 .mut_world()
                                 .create_now()
                                 .with(Transform::new(Vector3::new(x as f32, y as f32, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
                                 .with(RenderDataSpritesheet::new(self.main_render, art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::yellow::BLANK, art::main::SIZE))
                                 .build();
+
+                            self.planner.mut_world().write_w_comp_id::<Map>(()).get_mut(map).unwrap_or_else(|| panic!("Unable to Get Mut Map")).set_tile(Point2::new(x, y), tile);
                         }
                     }
-
-                    // for x in -5..5i32 {
-                    //     for y in -5..5i32 {
-                    //         planner.mut_world()
-                    //             .create_now()
-                    //             .with(Transform::new(Vector3::new(x as f32, y as f32, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
-                    //             .with(RenderDataSpritesheet::new(main_render, art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::yellow::BLANK, art::main::SIZE))
-                    //             .with(Button::new())
-                    //             .build();
-                    //     }
-                    // }
-                    //add main game scene
                 }
             }
         }

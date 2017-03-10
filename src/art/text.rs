@@ -1063,9 +1063,33 @@ fn make_8_render() -> Packet {
 }
 
 fn make_9_render() -> Packet {
-    let vertices = vec![];
+    let bot_left_top = Vertex::new([0.0, 0.2]); //0
+    let bot_left_bot = Vertex::new([0.0, 0.0]); //1
+    let bot_right_out = Vertex::new([1.0, 0.0]); //2
+    let bot_right_in = Vertex::new([0.8, 0.2]); //3
+    let mid_right_top = Vertex::new([0.8, 0.6]); //4
+    let mid_right_bot = Vertex::new([0.8, 0.4]); //5
+    let mid_left_out = Vertex::new([0.0, 0.4]); //6
+    let mid_left_in = Vertex::new([0.2, 0.6]); //7
+    let top_left_out = Vertex::new([0.0, 1.0]); //8
+    let top_left_in = Vertex::new([0.2, 0.8]); //9
+    let top_right_out = Vertex::new([1.0, 1.0]); //10
+    let top_right_in = Vertex::new([0.8, 0.8]); //11
 
-    let indices = vec![];
+    let vertices = vec![bot_left_top, bot_left_bot, bot_right_out, bot_right_in, mid_right_top, mid_right_bot, mid_left_out, mid_left_in, top_left_out, top_left_in, top_right_out, top_right_in];
+
+    let indices = vec![
+        0, 1, 2,//
+        2, 3, 0,
+        2, 10, 11,
+        11, 3, 2,
+        11, 10, 8,
+        8, 9, 11,
+        8, 6, 7,
+        7, 9, 8,
+        6, 5, 4,
+        4, 7, 6,
+    ];
 
     let rasterizer = Rasterizer::new_fill();
 
@@ -1073,9 +1097,27 @@ fn make_9_render() -> Packet {
 }
 
 fn make_0_render() -> Packet {
-    let vertices = vec![];
+    let top_left_out = Vertex::new([0.0, 1.0]); //0
+    let top_left_in = Vertex::new([0.2, 0.8]); //1
+    let bot_left_out = Vertex::new([0.0, 0.0]); //2
+    let bot_left_in = Vertex::new([0.2, 0.2]); //3
+    let bot_right_out = Vertex::new([1.0, 0.0]); //4
+    let bot_right_in = Vertex::new([0.8, 0.2]); //5
+    let top_right_out = Vertex::new([1.0, 1.0]); //6
+    let top_right_in = Vertex::new([0.8, 0.8]); //7
 
-    let indices = vec![];
+    let vertices = vec![top_left_out, top_left_in, bot_left_out, bot_left_in, bot_right_out, bot_right_in, top_right_out, top_right_in];
+
+    let indices = vec![
+        0, 2, 3,//
+        3, 1, 0,
+        2, 4, 5,
+        5, 3, 2,
+        4, 6, 7,
+        7, 5, 4,
+        6, 0, 1,
+        1, 7, 6,
+    ];
 
     let rasterizer = Rasterizer::new_fill();
 

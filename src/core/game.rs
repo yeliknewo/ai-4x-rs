@@ -6,7 +6,7 @@ use events::{MainFromGame, MainToGame};
 use find_folder::Search;
 use graphics::{NGFactory, OutColor, OutDepth, load_texture};
 use specs::{Planner, World};
-use systems::{ControlSystem, FpsCounterSystem, RenderSystem};
+use systems::{ControlSystem, FpsCounterSystem, MainMenuSystem, RenderSystem};
 use time::precise_time_ns;
 use utils::{DuoChannel, OrthographicHelper};
 
@@ -67,7 +67,22 @@ impl Game {
             renderer.add_render_text(factory, &packet, character);
         }
 
-        planner.add_system(ControlSystem::new(back_event_clump.take_control().unwrap_or_else(|| panic!("Control was none")), screen_size), "control", 15);
+        let play_button = planner.mut_world()
+            .create_now()
+            .with(Transform::new(Vector3::new(-0.5 * 1.2, -2.0 * 1.2, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(5.0 * 1.2, 5.0 * 1.2, 1.0)))
+            .with(RenderDataSpritesheet::new(main_render, art::layers::GUI, *art::main::DEFAULT_TINT, art::main::grey::BLANK, art::main::SIZE))
+            .with(Button::new(Point2::new(0.0, 0.0), Point2::new(1.0, 1.0)))
+            .build();
+
+        let play_button_text = planner.mut_world()
+            .create_now()
+            .with(Transform::new(Vector3::new(0.0, 0.0, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
+            .with(RenderDataText::new(art::layers::GUI, "play".into(), art::colors::WHITE, 1.2))
+            .build();
+
+        planner.add_system(ControlSystem::new(back_event_clump.take_control().unwrap_or_else(|| panic!("Control was none")), screen_size), "control", 20);
+
+        planner.add_system(MainMenuSystem::new(play_button, play_button_text), "main_menu", 15);
 
         planner.add_system(renderer, "renderer", 10);
 

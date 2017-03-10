@@ -1,5 +1,5 @@
 use art::main::blue;
-use cgmath::{MetricSpace, Point2, Vector2};
+use cgmath::{MetricSpace, Point2, Vector2, Vector4};
 use components::{Button, Camera, RenderDataSpritesheet, Transform};
 use events::{MainFromControl, MainToControl};
 use specs::{Join, RunArg, System};
@@ -24,7 +24,7 @@ impl ControlSystem {
 
 impl System<f64> for ControlSystem {
     fn run(&mut self, arg: RunArg, _delta_time: f64) {
-        let (cameras, transforms, mut buttons, mut render_datas_spritesheet) = arg.fetch(|w| (w.read::<Camera>(), w.read::<Transform>(), w.write::<Button>(), w.write::<RenderDataSpritesheet>()));
+        let (cameras, transforms, mut buttons) = arg.fetch(|w| (w.read::<Camera>(), w.read::<Transform>(), w.write::<Button>()));
 
         let camera = {
             let mut camera_opt = None;
@@ -39,24 +39,19 @@ impl System<f64> for ControlSystem {
             camera_opt.unwrap_or_else(|| panic!("No Main Camera Entity"))
         };
 
-
-
         let mut event_opt = self.main_channel.try_recv();
         while let Some(event) = event_opt.take() {
             match event {
                 MainToControl::MouseButton(state, mouse_button) => {
                     let mouse_in_world = camera.screen_to_world_point(self.mouse_pos);
 
-                    for (transform, mut button, mut render_data_spritesheet) in (&transforms, &mut buttons, &mut render_datas_spritesheet).iter() {
-                        let pos = transform.get_pos();
+                    for (transform, mut button) in (&transforms, &mut buttons).iter() {
+                        let bot_left = transform.get_model() * Vector4::new(button.get_bot_left().x, button.get_bot_left().y, 1.0, 1.0);
 
-                        let pos2 = Point2::new(pos.x, pos.y) + Vector2::new(0.5, 0.5);
+                        let top_right = transform.get_model() * Vector4::new(button.get_top_right().x, button.get_top_right().y, 1.0, 1.0);
 
-                        if mouse_in_world.distance(pos2) < 0.5 {
+                        if mouse_in_world.x >= bot_left.x && mouse_in_world.x <= top_right.x && mouse_in_world.y >= bot_left.y && mouse_in_world.y <= top_right.y {
                             button.set_button_state(mouse_button.clone(), state.clone());
-                            render_data_spritesheet.set_spritesheet_rect(blue::X);
-                        } else {
-                            //render_data.set_spritesheet_rect(yellow::BLANK);
                         }
                     }
                 }

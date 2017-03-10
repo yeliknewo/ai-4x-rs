@@ -7,17 +7,23 @@ pub struct Transform {
     translation: Vector3<f32>,
     rotation: Euler<Rad<f32>>,
     scale: Vector3<f32>,
+    matrix: Matrix4<f32>,
     dirty: bool,
 }
 
 impl Transform {
-    pub fn new(pos: Vector3<f32>, rotation: Euler<Rad<f32>>, scale: Vector3<f32>) -> Transform {
+    pub fn new(translation: Vector3<f32>, rotation: Euler<Rad<f32>>, scale: Vector3<f32>) -> Transform {
         Transform {
-            translation: pos,
+            translation: translation,
             rotation: rotation,
             scale: scale,
-            dirty: true,
+            matrix: Transform::make_matrix(translation, rotation, scale),
+            dirty: false,
         }
+    }
+
+    fn make_matrix(translation: Vector3<f32>, rotation: Euler<Rad<f32>>, scale: Vector3<f32>) -> Matrix4<f32> {
+        Matrix4::from_translation(translation) * Matrix4::from(rotation) * Matrix4::from_nonuniform_scale(scale.x, scale.y, scale.z)
     }
 
     pub fn new_identity() -> Transform {
@@ -38,8 +44,19 @@ impl Transform {
         self.translation
     }
 
+    pub fn update_model(&mut self) {
+        if self.take_dirty() {
+            self.matrix = Transform::make_matrix(self.translation, self.rotation, self.scale);
+        }
+    }
+
+    pub fn get_updated_model(&mut self) -> Matrix4<f32> {
+        self.update_model();
+        self.matrix
+    }
+
     pub fn get_model(&self) -> Matrix4<f32> {
-        Matrix4::from_translation(self.translation) * Matrix4::from(self.rotation) * Matrix4::from_nonuniform_scale(self.scale.x, self.scale.y, self.scale.z)
+        self.matrix
     }
 
     pub fn get_gui_offset(&self) -> Point2<f32> {
@@ -51,7 +68,7 @@ impl Transform {
         self.dirty = true;
     }
 
-    pub fn take_dirty(&mut self) -> bool {
+    fn take_dirty(&mut self) -> bool {
         if self.dirty {
             self.dirty = false;
             true

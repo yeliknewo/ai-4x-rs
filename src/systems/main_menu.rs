@@ -1,6 +1,6 @@
 use components::Button;
 use events::{GameFromMainMenu, GameToMainMenu};
-use specs::{Entity, Join, RunArg, System};
+use specs::{Entity, RunArg, System};
 use utils::{ButtonState, DuoChannel, MouseButton};
 
 #[derive(Debug)]
@@ -11,17 +11,12 @@ pub struct MainMenuSystem {
 }
 
 impl MainMenuSystem {
-    pub fn new(game_channel: DuoChannel<GameFromMainMenu, GameToMainMenu>) -> MainMenuSystem {
+    pub fn new(play_button: Entity, play_button_text: Entity, game_channel: DuoChannel<GameFromMainMenu, GameToMainMenu>) -> MainMenuSystem {
         MainMenuSystem {
             game_channel: game_channel,
-            play_button: None,
-            play_button_text: None,
+            play_button: Some(play_button),
+            play_button_text: Some(play_button_text),
         }
-    }
-
-    pub fn set_button(&mut self, play_button: Entity, play_button_text: Entity) {
-        self.play_button = Some(play_button);
-        self.play_button_text = Some(play_button_text);
     }
 }
 
@@ -36,12 +31,22 @@ impl System<f64> for MainMenuSystem {
                     ButtonState::Pressed => {
                         arg.delete(self.play_button.take().unwrap());
                         arg.delete(self.play_button_text.take().unwrap());
+                        self.game_channel.send(GameFromMainMenu::CreateMainGameScene);
                     }
                     ButtonState::Released => (),
                 }
             }
         } else {
+            while let Some(event) = self.game_channel.try_recv() {
+                match event {
+                    GameToMainMenu::SetPlayButtonEntities(play_button, play_button_text) => {
+                        self.play_button = Some(play_button);
+                        self.play_button_text = Some(play_button_text);
+                    }
+                }
+            }
 
+            arg.fetch(|_| ());
         }
     }
 }

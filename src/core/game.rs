@@ -5,16 +5,20 @@ use core::BackEventClump;
 use events::{GameFromMainMenu, GameToMainMenu, MainFromGame, MainToGame};
 use find_folder::Search;
 use graphics::{NGFactory, OutColor, OutDepth, load_texture};
-use specs::{Planner, World};
+use specs::{Planner, System, World};
+use std::collections::HashMap;
 use systems::{ControlSystem, FpsCounterSystem, MainMenuSystem, RenderSystem};
 use time::precise_time_ns;
 use utils::{DuoChannel, OrthographicHelper};
+
+const MAIN_MENU_SYSTEM_NAME: &'static str = "main_menu";
 
 pub struct Game {
     last_time: u64,
     planner: Planner<f64>,
     main_channel: DuoChannel<MainFromGame, MainToGame>,
     main_menu_channel: DuoChannel<GameToMainMenu, GameFromMainMenu>,
+    inactive_systems: HashMap<&'static str, Box<System<f64>>>,
 }
 
 impl Game {
@@ -83,11 +87,7 @@ impl Game {
 
         planner.add_system(ControlSystem::new(back_event_clump.take_main_x_control().unwrap_or_else(|| panic!("Main X Control was none")), screen_size), "control", 20);
 
-        let mut main_menu = MainMenuSystem::new(back_event_clump.take_back_game_x_main_menu().unwrap_or_else(|| panic!("Back Game X Main Menu was none")));
-
-        main_menu.set_button(play_button, play_button_text);
-
-        planner.add_system(main_menu, "main_menu", 15);
+        planner.add_system(MainMenuSystem::new(play_button, play_button_text, back_event_clump.take_back_game_x_main_menu().unwrap_or_else(|| panic!("Back Game X Main Menu was none"))), MAIN_MENU_SYSTEM_NAME, 15);
 
         planner.add_system(renderer, "renderer", 10);
 
@@ -97,6 +97,7 @@ impl Game {
             last_time: precise_time_ns(),
             main_channel: back_event_clump.take_main_x_game().unwrap_or_else(|| panic!("Main X Game was none")),
             main_menu_channel: back_event_clump.take_front_game_x_main_menu().unwrap_or_else(|| panic!("Front Game X Main Menu was none")),
+            inactive_systems: HashMap::new(),
             planner: planner,
         }
     }
@@ -113,6 +114,12 @@ impl Game {
         while let Some(event) = self.main_menu_channel.try_recv() {
             match event {
                 GameFromMainMenu::CreateMainGameScene => {
+                    for i in 0..self.planner.systems.len() {
+                        if self.planner.systems[i].name == MAIN_MENU_SYSTEM_NAME {
+                            self.inactive_systems.insert(MAIN_MENU_SYSTEM_NAME, self.planner.systems.remove(i).object);
+                            break;
+                        }
+                    }
                     //remove main_menu and store
                     //add main game scene
                 }

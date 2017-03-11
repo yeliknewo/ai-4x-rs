@@ -1,11 +1,11 @@
 use art;
-use cgmath::{Euler, Point2, Point3, Rad, Vector3};
-use components::{Button, Camera, Map, RenderDataSpritesheet, RenderDataText, Transform};
+use cgmath::{Euler, Point2, Point3, Rad, Vector2, Vector3};
+use components::{Button, Camera, City, Map, RenderDataSpritesheet, RenderDataText, Tile, Transform};
 use core::BackEventClump;
 use events::{GameFromMainMenu, GameToMainMenu, MainFromGame, MainToGame};
 use specs::{Planner, System, World};
 use std::collections::HashMap;
-use systems::{ControlSystem, FpsCounterSystem, MainMenuSystem, RenderSystem};
+use systems::{CitySystem, ControlSystem, FpsCounterSystem, MainMenuSystem, RenderSystem};
 use time::precise_time_ns;
 use utils::{DuoChannel, OrthographicHelper};
 
@@ -13,6 +13,14 @@ const SYSTEM_NAME_MAIN_MENU: &'static str = "main_menu";
 const SYSTEM_NAME_RENDERER: &'static str = "renderer";
 const SYSTEM_NAME_CONTROL: &'static str = "control";
 const SYSTEM_NAME_FPS_COUNTER: &'static str = "fps_counter";
+const SYSTEM_NAME_CITY: &'static str = "city";
+
+const SYSTEM_PRIORITY_MAIN_MENU: i32 = 15;
+const SYSTEM_PRIORITY_RENDERER: i32 = 10;
+const SYSTEM_PRIORITY_CONTROL: i32 = 20;
+const SYSTEM_PRIORITY_FPS_COUNTER: i32 = 5;
+const SYSTEM_PRIORITY_CITY: i32 = 15;
+
 const WARN_FPS: u32 = 55;
 const TARGET_FPS: f64 = 60.0;
 
@@ -34,17 +42,17 @@ impl Game {
 
             world.register::<Button>();
             world.register::<Camera>();
+            world.register::<City>();
             world.register::<Map>();
             world.register::<RenderDataSpritesheet>();
             world.register::<RenderDataText>();
+            world.register::<Tile>();
             world.register::<Transform>();
 
             Planner::<f64>::new(world)
         };
 
         planner.mut_world().create_now().with(Camera::new(Point3::new(0.0, 0.0, 2.0), Point3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 1.0, 0.0), ortho, true)).build();
-
-
 
         let play_button = planner.mut_world()
             .create_now()
@@ -59,13 +67,13 @@ impl Game {
             .with(RenderDataText::new(art::layers::GUI, "play".into(), art::colors::WHITE, 1.2))
             .build();
 
-        planner.add_system(ControlSystem::new(back_event_clump.take_main_x_control().unwrap_or_else(|| panic!("Main X Control was none")), screen_size), SYSTEM_NAME_CONTROL, 20);
+        planner.add_system(ControlSystem::new(back_event_clump.take_main_x_control().unwrap_or_else(|| panic!("Main X Control was none")), screen_size), SYSTEM_NAME_CONTROL, SYSTEM_PRIORITY_CONTROL);
 
-        planner.add_system(MainMenuSystem::new(play_button, play_button_text, back_event_clump.take_back_game_x_main_menu().unwrap_or_else(|| panic!("Back Game X Main Menu was none"))), SYSTEM_NAME_MAIN_MENU, 15);
+        planner.add_system(MainMenuSystem::new(play_button, play_button_text, back_event_clump.take_back_game_x_main_menu().unwrap_or_else(|| panic!("Back Game X Main Menu was none"))), SYSTEM_NAME_MAIN_MENU, SYSTEM_PRIORITY_MAIN_MENU);
 
-        planner.add_system(render_system, SYSTEM_NAME_RENDERER, 10);
+        planner.add_system(render_system, SYSTEM_NAME_RENDERER, SYSTEM_PRIORITY_RENDERER);
 
-        planner.add_system(FpsCounterSystem::new(WARN_FPS), SYSTEM_NAME_FPS_COUNTER, 5);
+        planner.add_system(FpsCounterSystem::new(WARN_FPS), SYSTEM_NAME_FPS_COUNTER, SYSTEM_PRIORITY_FPS_COUNTER);
 
         Game {
             last_time: precise_time_ns(),
@@ -96,20 +104,38 @@ impl Game {
                         }
                     }
 
-                    let map = self.planner.mut_world().create_now().with(Map::new()).build();
+                    let min = Vector2::new(-10, -10);
+                    let max = Vector2::new(10, 10);
 
-                    for y in -10..10i32 {
-                        for x in -10..10i32 {
+                    let map = self.planner.mut_world().create_now().with(Map::new(min, max)).build();
+
+                    for y in min.y..max.y {
+                        for x in min.x..max.x {
+                            let food = 1;
+                            let iron = 1;
+                            let gold = 1;
+
                             let tile = self.planner
                                 .mut_world()
                                 .create_now()
                                 .with(Transform::new(Vector3::new(x as f32, y as f32, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
                                 .with(RenderDataSpritesheet::new(self.main_render, art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::yellow::BLANK, art::main::SIZE))
+                                .with(Tile::new(food, iron, gold))
                                 .build();
 
-                            self.planner.mut_world().write_w_comp_id::<Map>(()).get_mut(map).unwrap_or_else(|| panic!("Unable to Get Mut Map")).set_tile(Point2::new(x, y), tile);
+                            self.planner.mut_world().write_w_comp_id::<Map>(()).get_mut(map).unwrap_or_else(|| panic!("Unable to Get Mut Map")).set_tile(Vector2::new(x, y), tile);
                         }
                     }
+
+                    self.planner
+                        .mut_world()
+                        .create_now()
+                        .with(Transform::new(Vector3::new(0.0, 0.0, 0.0), Euler::new(Rad(0.0), Rad(0.0), Rad(0.0)), Vector3::new(1.0, 1.0, 1.0)))
+                        .with(RenderDataSpritesheet::new(self.main_render, art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::green::STAR, art::main::SIZE))
+                        .with(City::new(Vector2::new(0, 0), 1))
+                        .build();
+
+                    self.planner.add_system(CitySystem::new(map), SYSTEM_NAME_CITY, SYSTEM_PRIORITY_CITY);
                 }
             }
         }

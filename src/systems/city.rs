@@ -35,7 +35,7 @@ impl System<f64> for CitySystem {
 
                     let tile_entity = map.get_tile(&tile_pos);
 
-                    let tile = tiles.get(tile_entity).unwrap_or_else(|| panic!("Tile Entity wasn't in Tiles"));
+                    // let tile = tiles.get(tile_entity).unwrap_or_else(|| panic!("Tile Entity wasn't in Tiles"));
                 }
             }
 

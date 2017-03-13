@@ -15,6 +15,18 @@ impl Tile {
             gold: gold,
         }
     }
+
+    pub fn get_food(&self) -> i32 {
+        self.food
+    }
+
+    pub fn get_iron(&self) -> i32 {
+        self.iron
+    }
+
+    pub fn get_gold(&self) -> i32 {
+        self.gold
+    }
 }
 
 impl Component for Tile {

@@ -9,11 +9,11 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use utils::DuoChannel;
 
-pub struct RenderSystem<ID>
+pub struct SystemRender<ID>
     where ID: Send + Eq
 {
     done: bool,
-    main_channel: DuoChannel<MainFromRender<ID>, MainToRender<ID>>,
+    channel_main: DuoChannel<MainFromRender<ID>, MainToRender<ID>>,
     out_color: OutColor,
     out_depth: OutDepth,
     bundles_spritesheet: Arc<Vec<pipeline_spritesheet::Bundle<NGResources>>>,
@@ -22,13 +22,13 @@ pub struct RenderSystem<ID>
     shaders: HashMap<RenderType, Shaders>,
 }
 
-impl<ID> RenderSystem<ID>
+impl<ID> SystemRender<ID>
     where ID: Send + Eq
 {
-    pub fn new(main_channel: DuoChannel<MainFromRender<ID>, MainToRender<ID>>, out_color: OutColor, out_depth: OutDepth) -> RenderSystem<ID> {
-        RenderSystem {
+    pub fn new(channel_main: DuoChannel<MainFromRender<ID>, MainToRender<ID>>, out_color: OutColor, out_depth: OutDepth) -> SystemRender<ID> {
+        SystemRender {
             done: false,
-            main_channel: main_channel,
+            channel_main: channel_main,
             out_color: out_color,
             out_depth: out_depth,
             bundles_spritesheet: Arc::new(vec![]),
@@ -252,7 +252,7 @@ impl<ID> RenderSystem<ID>
         }
 
 
-        self.main_channel.send(MainFromRender::Encoder(encoder, encoder_id));
+        self.channel_main.send(MainFromRender::Encoder(encoder, encoder_id));
     }
 
     fn process_event(&mut self, arg: &RunArg, event: MainToRender<ID>) -> bool {
@@ -262,7 +262,7 @@ impl<ID> RenderSystem<ID>
                 false
             }
             MainToRender::Exit => {
-                self.main_channel.send(MainFromRender::Exited);
+                self.channel_main.send(MainFromRender::Exited);
                 arg.fetch(|_| {});
                 self.done = true;
                 false
@@ -271,7 +271,7 @@ impl<ID> RenderSystem<ID>
     }
 }
 
-impl<ID> System<f64> for RenderSystem<ID>
+impl<ID> System<f64> for SystemRender<ID>
     where ID: Send + Eq
 {
     fn run(&mut self, arg: RunArg, _delta_time: f64) {
@@ -279,7 +279,7 @@ impl<ID> System<f64> for RenderSystem<ID>
             arg.fetch(|_| {});
             return;
         }
-        let mut event = self.main_channel.try_recv();
+        let mut event = self.channel_main.try_recv();
         while self.process_event(&arg,
                                  match event {
                                      Some(event) => event,
@@ -288,7 +288,7 @@ impl<ID> System<f64> for RenderSystem<ID>
                                          return;
                                      }
                                  }) {
-            event = self.main_channel.try_recv();
+            event = self.channel_main.try_recv();
         }
     }
 }

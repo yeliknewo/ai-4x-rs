@@ -2,10 +2,12 @@ use specs::Entity;
 
 #[derive(Debug)]
 pub enum GameToMainMenu {
-    SetPlayButtonEntities(Entity, Entity),
+    SetEntitiesPlayButton(Entity, Entity),
+    Cleanup,
 }
 
 #[derive(Debug)]
 pub enum GameFromMainMenu {
     CreateMainGameScene,
+    CleanupDone,
 }

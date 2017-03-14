@@ -25,6 +25,10 @@ impl Map {
     pub fn set_tile(&mut self, vector: Vector2<i32>, entity: Entity) {
         self.map.insert(vector, entity);
     }
+
+    pub fn get_tiles(&self) -> &HashMap<Vector2<i32>, Entity> {
+        &self.map
+    }
 }
 
 impl Component for Map {

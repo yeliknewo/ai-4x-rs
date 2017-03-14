@@ -40,21 +40,21 @@ impl OrthographicHelper {
         self.ortho.top
     }
 
-    pub fn get_near(&self) -> f32 {
-        self.ortho.near
-    }
-
-    pub fn get_far(&self) -> f32 {
-        self.ortho.far
-    }
-
-    pub fn get_view_depth(&self) -> f32 {
-        self.get_far() - self.get_near()
-    }
-
-    pub fn get_aspect_ratio(&self) -> f32 {
-        self.aspect_ratio
-    }
+    // pub fn get_near(&self) -> f32 {
+    //     self.ortho.near
+    // }
+    //
+    // pub fn get_far(&self) -> f32 {
+    //     self.ortho.far
+    // }
+    //
+    // pub fn get_view_depth(&self) -> f32 {
+    //     self.get_far() - self.get_near()
+    // }
+    //
+    // pub fn get_aspect_ratio(&self) -> f32 {
+    //     self.aspect_ratio
+    // }
 
     pub fn build_matrix(&self) -> Matrix4<f32> {
         Matrix4::from(self.ortho)

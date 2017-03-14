@@ -4,48 +4,54 @@ use specs::{Entity, RunArg, System};
 use utils::{ButtonState, DuoChannel, MouseButton};
 
 #[derive(Debug)]
-pub struct MainMenuSystem {
-    game_channel: DuoChannel<GameFromMainMenu, GameToMainMenu>,
-    play_button: Option<Entity>,
-    play_button_text: Option<Entity>,
+pub struct SystemMainMenu {
+    channel_game: DuoChannel<GameFromMainMenu, GameToMainMenu>,
+    entity_opt_play_button: Option<Entity>,
+    entity_opt_play_button_text: Option<Entity>,
 }
 
-impl MainMenuSystem {
-    pub fn new(play_button: Entity, play_button_text: Entity, game_channel: DuoChannel<GameFromMainMenu, GameToMainMenu>) -> MainMenuSystem {
-        MainMenuSystem {
-            game_channel: game_channel,
-            play_button: Some(play_button),
-            play_button_text: Some(play_button_text),
+impl SystemMainMenu {
+    pub fn new(channel_game: DuoChannel<GameFromMainMenu, GameToMainMenu>) -> SystemMainMenu {
+        SystemMainMenu {
+            channel_game: channel_game,
+            entity_opt_play_button: None,
+            entity_opt_play_button_text: None,
         }
     }
 }
 
-impl System<f64> for MainMenuSystem {
+impl System<f64> for SystemMainMenu {
     fn run(&mut self, arg: RunArg, _delta_time: f64) {
-        if self.play_button.is_some() && self.play_button_text.is_some() {
+        while let Some(event) = self.channel_game.try_recv() {
+            match event {
+                GameToMainMenu::SetEntitiesPlayButton(entity_play_button, entity_play_button_text) => {
+                    self.entity_opt_play_button = Some(entity_play_button);
+                    self.entity_opt_play_button_text = Some(entity_play_button_text);
+                }
+                GameToMainMenu::Cleanup => {
+                    if let Some(entity_play_button) = self.entity_opt_play_button.take() {
+                        arg.delete(entity_play_button);
+                    }
+                    if let Some(entity_play_button_text) = self.entity_opt_play_button_text.take() {
+                        arg.delete(entity_play_button_text);
+                    }
+                    self.channel_game.send(GameFromMainMenu::CleanupDone);
+                }
+            }
+        }
 
+        if self.entity_opt_play_button.is_some() {
             let buttons = arg.fetch(|w| (w.read::<Button>()));
 
-            if let Some(play_button) = buttons.get(self.play_button.unwrap()) {
+            if let Some(play_button) = buttons.get(self.entity_opt_play_button.unwrap()) {
                 match play_button.get_button_state(MouseButton::Left) {
                     ButtonState::Pressed => {
-                        arg.delete(self.play_button.take().unwrap());
-                        arg.delete(self.play_button_text.take().unwrap());
-                        self.game_channel.send(GameFromMainMenu::CreateMainGameScene);
+                        self.channel_game.send(GameFromMainMenu::CreateMainGameScene);
                     }
                     ButtonState::Released => (),
                 }
             }
         } else {
-            while let Some(event) = self.game_channel.try_recv() {
-                match event {
-                    GameToMainMenu::SetPlayButtonEntities(play_button, play_button_text) => {
-                        self.play_button = Some(play_button);
-                        self.play_button_text = Some(play_button_text);
-                    }
-                }
-            }
-
             arg.fetch(|_| ());
         }
     }

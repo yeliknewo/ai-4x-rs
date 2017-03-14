@@ -5,15 +5,15 @@ use specs::{Join, RunArg, System};
 use utils::DuoChannel;
 
 #[derive(Debug)]
-pub struct ControlSystem {
+pub struct SystemControl {
     main_channel: DuoChannel<MainFromControl, MainToControl>,
     mouse_pos: Point2<f32>,
     screen_size: Point2<f32>,
 }
 
-impl ControlSystem {
-    pub fn new(main_channel: DuoChannel<MainFromControl, MainToControl>, screen_size: Point2<f32>) -> ControlSystem {
-        ControlSystem {
+impl SystemControl {
+    pub fn new(main_channel: DuoChannel<MainFromControl, MainToControl>, screen_size: Point2<f32>) -> SystemControl {
+        SystemControl {
             main_channel: main_channel,
             mouse_pos: Point2::new(0.0, 0.0),
             screen_size: screen_size,
@@ -21,7 +21,7 @@ impl ControlSystem {
     }
 }
 
-impl System<f64> for ControlSystem {
+impl System<f64> for SystemControl {
     fn run(&mut self, arg: RunArg, _delta_time: f64) {
         let (cameras, transforms, mut buttons) = arg.fetch(|w| (w.read::<Camera>(), w.read::<Transform>(), w.write::<Button>()));
 

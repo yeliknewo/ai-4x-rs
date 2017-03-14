@@ -7,7 +7,7 @@ use find_folder::Search;
 use gfx::Device;
 use graphics::load_texture;
 use std::thread;
-use systems::RenderSystem;
+use systems::SystemRender;
 use utils::OrthographicHelper;
 
 const VALID_CHARACTERS: &'static str = "abcdefghijklmnopqrstuvwxyz1234567890";
@@ -46,7 +46,7 @@ pub fn start() {
 
         let ortho = OrthographicHelper::new(aspect_ratio, left, right, near, far);
 
-        let mut renderer = RenderSystem::new(back_event_clump.take_main_x_render().unwrap_or_else(|| panic!("Main X Render was none")), out_color, out_depth);
+        let mut renderer = SystemRender::new(back_event_clump.take_main_x_render().unwrap_or_else(|| panic!("Main X Render was none")), out_color, out_depth);
 
         let packet_square = art::make_square_render();
 

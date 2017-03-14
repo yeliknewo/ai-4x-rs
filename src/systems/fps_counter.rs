@@ -1,15 +1,15 @@
 use specs::{RunArg, System};
 
 #[derive(Debug)]
-pub struct FpsCounterSystem {
+pub struct SystemFpsCounter {
     current_delta: f64,
     frames: u32,
     low_frame_rate: u32,
 }
 
-impl FpsCounterSystem {
-    pub fn new(low_frame_rate: u32) -> FpsCounterSystem {
-        FpsCounterSystem {
+impl SystemFpsCounter {
+    pub fn new(low_frame_rate: u32) -> SystemFpsCounter {
+        SystemFpsCounter {
             current_delta: 0.0,
             frames: 0,
             low_frame_rate: low_frame_rate,
@@ -33,7 +33,7 @@ impl FpsCounterSystem {
 }
 
 
-impl System<f64> for FpsCounterSystem {
+impl System<f64> for SystemFpsCounter {
     fn run(&mut self, arg: RunArg, delta_time: f64) {
         arg.fetch(|_| ());
 

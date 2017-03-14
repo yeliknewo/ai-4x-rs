@@ -27,9 +27,9 @@ impl<S, R> DuoChannel<S, R> {
         self.send.send(event).unwrap_or_else(|err| panic!("Failed to send because: {}", err));
     }
 
-    pub fn recv(&mut self) -> R {
-        self.recv.recv().unwrap_or_else(|err| panic!("Recv from error: {}", err))
-    }
+    // pub fn recv(&mut self) -> R {
+    //     self.recv.recv().unwrap_or_else(|err| panic!("Recv from error: {}", err))
+    // }
 
     pub fn try_recv(&mut self) -> Option<R> {
         match self.recv.try_recv() {

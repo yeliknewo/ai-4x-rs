@@ -9,6 +9,7 @@ use utils::DuoChannel;
 pub struct SystemMainGameCity {
     channel_game: DuoChannel<GameFromMainGameCity, GameToMainGameCity>,
     entity_opt_map: Option<Entity>,
+    entity_opt_city: Option<Entity>,
 }
 
 impl SystemMainGameCity {
@@ -16,6 +17,7 @@ impl SystemMainGameCity {
         SystemMainGameCity {
             channel_game: channel_game,
             entity_opt_map: None,
+            entity_opt_city: None,
         }
     }
 }
@@ -23,12 +25,17 @@ impl SystemMainGameCity {
 
 impl System<f64> for SystemMainGameCity {
     fn run(&mut self, arg: RunArg, _delta_time: f64) {
-        let (entities, mut cities, maps, tiles, mut render_datas_spritesheet) = arg.fetch(|w| (w.entities(), w.write::<City>(), w.read::<Map>(), w.read::<Tile>(), w.write::<RenderDataSpritesheet>()));
+        let (mut cities, maps, tiles, mut render_datas_spritesheet) = arg.fetch(|w| (w.write::<City>(), w.read::<Map>(), w.read::<Tile>(), w.write::<RenderDataSpritesheet>()));
 
         while let Some(event) = self.channel_game.try_recv() {
             match event {
                 GameToMainGameCity::Cleanup => {}
-
+                GameToMainGameCity::SetEntityCity(entity_city) => {
+                    self.entity_opt_city = Some(entity_city);
+                }
+                GameToMainGameCity::SetEntityMap(entity_map) => {
+                    self.entity_opt_map = Some(entity_map);
+                }
             }
         }
 

@@ -1,9 +1,9 @@
 use art;
 use cgmath::{Euler, Point2, Point3, Rad, Vector2, Vector3};
-use components::{Button, Camera, City, Map, RenderDataSpritesheet, RenderDataText, Tile, Transform};
+use components::{Button, Camera, City, Map, RenderDataSpritesheet, RenderDataText, Scene, Tile, Transform};
 use core::BackEventClump;
 use events::{GameFromMainGameCity, GameFromMainGameMap, GameFromMainGamePauseMenu, GameFromMainMenu, GameToMainGameCity, GameToMainGameMap, GameToMainGamePauseMenu, GameToMainMenu, MainFromGame, MainToGame};
-use specs::{Planner, System, SystemInfo, World};
+use specs::{Entity, Planner, System, SystemInfo, World};
 use std::collections::HashMap;
 use systems::{SystemControl, SystemFpsCounter, SystemMainGameCity, SystemMainGameMap, SystemMainGamePauseMenu, SystemMainMenu, SystemRender};
 use time::precise_time_ns;
@@ -61,6 +61,7 @@ impl Game {
             world.register::<Map>();
             world.register::<RenderDataSpritesheet>();
             world.register::<RenderDataText>();
+            world.register::<Scene>();
             world.register::<Tile>();
             world.register::<Transform>();
 
@@ -108,6 +109,8 @@ impl Game {
 
         let map = self.planner.mut_world().create_now().with(Map::new(min, max)).build();
 
+        self.add_to_scene(map);
+
         self.channel_main_game_map.send(GameToMainGameMap::SetEntityMap(map));
         self.channel_main_game_city.send(GameToMainGameCity::SetEntityMap(map));
 
@@ -125,6 +128,8 @@ impl Game {
                     .with(Tile::new(food, iron, gold))
                     .build();
 
+                self.add_to_scene(tile);
+
                 self.planner.mut_world().write_w_comp_id::<Map>(()).get_mut(map).unwrap_or_else(|| panic!("Unable to Get Mut Map")).set_tile(Vector2::new(x, y), tile);
             }
         }
@@ -136,6 +141,8 @@ impl Game {
             .with(RenderDataSpritesheet::new(self.main_render, art::layers::PLAYER, *art::main::DEFAULT_TINT, art::main::green::STAR, art::main::SIZE))
             .with(City::new(Vector2::new(0, 0), 1))
             .build();
+
+        self.add_to_scene(city);
 
         self.channel_main_game_city.send(GameToMainGameCity::SetEntityCity(city));
 
@@ -150,6 +157,8 @@ impl Game {
             .with(Button::new(Point2::new(0.0, 0.0), Point2::new(1.0, 1.0)))
             .build();
 
+        self.add_to_scene(exit_button);
+
         let exit_button_text = self.planner
             .mut_world()
             .create_now()
@@ -157,18 +166,20 @@ impl Game {
             .with(RenderDataText::new(art::layers::GUI, "exit".into(), art::colors::WHITE, 1.2))
             .build();
 
+        self.add_to_scene(exit_button_text);
+
         self.channel_main_game_pause_menu.send(GameToMainGamePauseMenu::SetEntitiesExitButton(exit_button, exit_button_text));
     }
 
-    fn cleanup_main_game_scene(&mut self) {
+    fn exit_main_game_scene(&mut self) {
         self.channel_main_game_pause_menu.send(GameToMainGamePauseMenu::Cleanup);
         self.channel_main_game_map.send(GameToMainGameMap::Cleanup);
-    }
-
-    fn exit_main_game_scene(&mut self) {
+        self.channel_main_game_city.send(GameToMainGameCity::Cleanup);
+        self.delete_scene();
         self.deactivate_system(SYSTEM_MAIN_GAME_PAUSE_MENU);
         self.deactivate_system(SYSTEM_MAIN_GAME_CITY);
         self.deactivate_system(SYSTEM_MAIN_GAME_MAP);
+        self.make_scene();
     }
 
     fn create_main_menu_scene(&mut self) {
@@ -189,15 +200,45 @@ impl Game {
             .with(RenderDataText::new(art::layers::GUI, "play".into(), art::colors::WHITE, 1.2))
             .build();
 
+        self.add_to_scene(play_button);
+        self.add_to_scene(play_button_text);
+
         self.channel_main_menu.send(GameToMainMenu::SetEntitiesPlayButton(play_button, play_button_text));
     }
 
-    fn cleanup_main_menu_scene(&mut self) {
+    fn exit_main_menu_scene(&mut self) {
         self.channel_main_menu.send(GameToMainMenu::Cleanup);
+        self.delete_scene();
+        self.deactivate_system(SYSTEM_MAIN_MENU);
+        self.make_scene();
     }
 
-    fn exit_main_menu_scene(&mut self) {
-        self.deactivate_system(SYSTEM_MAIN_MENU);
+    fn make_scene(&mut self) {
+        self.planner.mut_world().create_now().with(Scene::new()).build();
+    }
+
+    fn add_to_scene(&mut self, entity: Entity) {
+        use specs::Join;
+
+        for mut scene in (&mut self.planner.mut_world().write_w_comp_id::<Scene>(())).join() {
+            scene.get_mut_entities().push(entity);
+            scene.get_mut_entities().sort();
+            scene.get_mut_entities().dedup();
+            break;
+        }
+    }
+
+    fn delete_scene(&mut self) {
+        use specs::Join;
+
+        let world = self.planner.mut_world();
+
+        for (scene, entity) in (&world.read_w_comp_id::<Scene>(()), &world.entities()).join() {
+            for entity in scene.get_entities() {
+                world.delete_later(*entity);
+            }
+            world.delete_later(entity);
+        }
     }
 
     fn deactivate_system(&mut self, system_ident: SystemIdent) {
@@ -231,9 +272,6 @@ impl Game {
         while let Some(event) = self.channel_main_menu.try_recv() {
             match event {
                 GameFromMainMenu::CreateMainGameScene => {
-                    self.cleanup_main_menu_scene();
-                }
-                GameFromMainMenu::CleanupDone => {
                     self.exit_main_menu_scene();
                     self.create_main_game_scene();
                 }
@@ -242,9 +280,6 @@ impl Game {
         while let Some(event) = self.channel_main_game_pause_menu.try_recv() {
             match event {
                 GameFromMainGamePauseMenu::CreateMainMenuScene => {
-                    self.cleanup_main_game_scene();
-                }
-                GameFromMainGamePauseMenu::CleanupDone => {
                     self.exit_main_game_scene();
                     self.create_main_menu_scene();
                 }

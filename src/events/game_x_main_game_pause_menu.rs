@@ -9,5 +9,4 @@ pub enum GameToMainGamePauseMenu {
 #[derive(Debug)]
 pub enum GameFromMainGamePauseMenu {
     CreateMainMenuScene,
-    CleanupDone,
 }

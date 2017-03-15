@@ -29,13 +29,8 @@ impl System<f64> for SystemMainMenu {
                     self.entity_opt_play_button_text = Some(entity_play_button_text);
                 }
                 GameToMainMenu::Cleanup => {
-                    if let Some(entity_play_button) = self.entity_opt_play_button.take() {
-                        arg.delete(entity_play_button);
-                    }
-                    if let Some(entity_play_button_text) = self.entity_opt_play_button_text.take() {
-                        arg.delete(entity_play_button_text);
-                    }
-                    self.channel_game.send(GameFromMainMenu::CleanupDone);
+                    self.entity_opt_play_button = None;
+                    self.entity_opt_play_button_text = None;
                 }
             }
         }

@@ -25,15 +25,7 @@ impl System<f64> for SystemMainGameMap {
         while let Some(event) = self.channel_game.try_recv() {
             match event {
                 GameToMainGameMap::Cleanup => {
-                    if let Some(map_entity) = self.entity_opt_map.take() {
-                        if let Some(map) = maps.get(map_entity) {
-                            for tile in map.get_tiles().values() {
-                                arg.delete(*tile);
-                            }
-                        }
-                        arg.delete(map_entity);
-                    }
-                    self.channel_game.send(GameFromMainGameMap::CleanupDone);
+                    self.entity_opt_map = None;
                 }
                 GameToMainGameMap::SetEntityMap(entity_map) => {
                     self.entity_opt_map = Some(entity_map);

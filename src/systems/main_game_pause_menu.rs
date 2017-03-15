@@ -29,13 +29,8 @@ impl System<f64> for SystemMainGamePauseMenu {
                     self.entity_opt_exit_button_text = Some(entity_exit_button_text);
                 }
                 GameToMainGamePauseMenu::Cleanup => {
-                    if let Some(entity_exit_button) = self.entity_opt_exit_button.take() {
-                        arg.delete(entity_exit_button);
-                    }
-                    if let Some(entity_exit_button_text) = self.entity_opt_exit_button_text.take() {
-                        arg.delete(entity_exit_button_text);
-                    }
-                    self.channel_game.send(GameFromMainGamePauseMenu::CleanupDone);
+                    self.entity_opt_exit_button = None;
+                    self.entity_opt_exit_button_text = None;
                 }
             }
         }

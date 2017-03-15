@@ -9,5 +9,5 @@ pub enum GameToMainGameCity {
 
 #[derive(Debug)]
 pub enum GameFromMainGameCity {
-    CleanupDone,
+
 }
